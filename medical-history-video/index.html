@@ -1,0 +1,586 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>医学简史</title>
+<style>
+@font-face{font-family:NS;src:url(fonts/sans-chinese-simplified-400.woff2);font-weight:400}
+@font-face{font-family:NS;src:url(fonts/sans-chinese-simplified-700.woff2);font-weight:700}
+@font-face{font-family:NS;src:url(fonts/sans-chinese-simplified-900.woff2);font-weight:900}
+@font-face{font-family:NS;src:url(fonts/sans-latin-400.woff2);font-weight:400;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:NS;src:url(fonts/sans-latin-700.woff2);font-weight:700;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:NS;src:url(fonts/sans-latin-900.woff2);font-weight:900;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:SF;src:url(fonts/serif-chinese-simplified-700.woff2);font-weight:700}
+@font-face{font-family:SF;src:url(fonts/serif-chinese-simplified-900.woff2);font-weight:900}
+@font-face{font-family:SF;src:url(fonts/serif-latin-700.woff2);font-weight:700;unicode-range:U+0000-00FF,U+2000-206F}
+@font-face{font-family:SF;src:url(fonts/serif-latin-900.woff2);font-weight:900;unicode-range:U+0000-00FF,U+2000-206F}
+
+:root{--c:#3ef2d0;--c2:#c8fff3;--w:#ffc86b}
+html,body{margin:0;background:#000}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:NS,sans-serif;color:#fff;
+  background:linear-gradient(180deg,#02060d 0%,#061a2b 45%,#04111f 70%,#02060d 100%)}
+.abs{position:absolute}
+#grid{inset:0;background-image:linear-gradient(rgba(62,242,208,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(62,242,208,.07) 1px,transparent 1px);
+  background-size:60px 60px;-webkit-mask-image:radial-gradient(ellipse 70% 55% at 50% 45%,#000 20%,transparent 80%)}
+#halo{left:90px;top:400px;width:900px;height:900px;border-radius:50%;
+  background:radial-gradient(circle,rgba(62,242,208,.28) 0%,rgba(62,242,208,.08) 35%,transparent 65%)}
+#vig{inset:0;background:radial-gradient(ellipse 80% 65% at 50% 45%,transparent 50%,rgba(0,0,0,.65) 100%);pointer-events:none}
+#parts{left:0;top:0}
+
+#hdr{left:70px;right:70px;top:140px;display:flex;justify-content:space-between;align-items:center;font-size:34px;font-weight:700;letter-spacing:6px;color:rgba(255,255,255,.72)}
+#hdr .n{font-family:SF;font-weight:900;color:var(--c);letter-spacing:4px}
+#hdr .n i{font-style:normal;color:rgba(255,255,255,.35)}
+
+#year{left:0;right:0;top:226px;text-align:center}
+#pre{height:62px;font-size:44px;font-weight:700;letter-spacing:10px;color:var(--w)}
+#digits{display:flex;justify-content:center;align-items:flex-end;font-family:SF;font-weight:900;font-size:230px;line-height:1;
+  text-shadow:0 0 36px rgba(62,242,208,.55),0 0 90px rgba(62,242,208,.25)}
+.slot{height:1.1em;width:.6em;overflow:hidden;position:relative;
+  -webkit-mask-image:linear-gradient(transparent 0,#000 14%,#000 86%,transparent 100%)}
+.strip{position:absolute;left:0;right:0;top:0}
+.strip div{height:1.4em;line-height:1.4em;text-align:center;font-variant-numeric:tabular-nums}
+#nian{font-family:NS;font-weight:700;font-size:64px;margin-left:14px;padding-bottom:60px;color:rgba(255,255,255,.85);text-shadow:none}
+
+#iconWrap{left:280px;top:590px;width:520px;height:520px}
+#ring{position:absolute;left:0;top:0}
+#icon{position:absolute;left:40px;top:40px;overflow:visible}
+
+.txt{left:40px;right:40px;text-align:center}
+#title{top:1136px;font-size:76px;font-weight:900;letter-spacing:2px;text-shadow:0 4px 30px rgba(0,0,0,.6),0 0 24px rgba(62,242,208,.25)}
+#sub{top:1240px;font-size:46px;font-weight:700;color:var(--c2);letter-spacing:3px}
+#sub b{color:var(--w);font-weight:900}
+
+#ecg{left:0;top:1340px}
+#tl{left:0;top:1630px}
+
+#intro{left:0;right:0;top:0;bottom:0}
+#i30{top:560px;font-family:NS;font-size:250px;font-weight:900;color:var(--w);line-height:1;
+  text-shadow:0 0 50px rgba(255,200,107,.5),0 0 120px rgba(255,200,107,.25)}
+#i30 small{font-size:120px;margin-left:6px}
+#iMain{top:860px;font-size:96px;font-weight:900;letter-spacing:4px;text-shadow:0 0 30px rgba(62,242,208,.35)}
+#iSub{top:1010px;font-size:46px;font-weight:700;color:var(--c);letter-spacing:8px}
+
+#outro{left:0;right:0;top:0;bottom:0}
+#oHdr{top:220px;font-size:60px;font-weight:900;letter-spacing:8px;color:rgba(255,255,255,.92)}
+#oNum{top:300px;font-family:SF;font-weight:900;font-size:280px;line-height:1;color:var(--w);
+  text-shadow:0 0 50px rgba(255,200,107,.5),0 0 120px rgba(255,200,107,.2)}
+#oNum small{font-family:NS;font-size:84px;font-weight:700;margin-left:10px;color:#fff;text-shadow:none}
+#oYear{top:600px;font-size:44px;font-weight:700;color:var(--c);letter-spacing:4px}
+#chart{left:90px;top:680px}
+#oFinal{top:1150px;font-size:74px;font-weight:900;letter-spacing:3px;text-shadow:0 0 30px rgba(62,242,208,.35)}
+#oSrc{top:1262px;font-size:26px;color:rgba(255,255,255,.4);letter-spacing:2px}
+#black{inset:0;background:#000;opacity:0}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <filter id="vb0" x="-40%" y="-50%" width="180%" height="200%"><feGaussianBlur stdDeviation="0 0"/></filter>
+  <filter id="vb1" x="-40%" y="-50%" width="180%" height="200%"><feGaussianBlur stdDeviation="0 0"/></filter>
+  <filter id="vb2" x="-40%" y="-50%" width="180%" height="200%"><feGaussianBlur stdDeviation="0 0"/></filter>
+  <filter id="vb3" x="-40%" y="-50%" width="180%" height="200%"><feGaussianBlur stdDeviation="0 0"/></filter>
+</defs></svg>
+<div id="stage">
+  <div id="grid" class="abs"></div>
+  <div id="halo" class="abs"></div>
+  <canvas id="parts" class="abs" width="1080" height="1920"></canvas>
+
+  <div id="main" class="abs" style="inset:0">
+    <div id="hdr" class="abs"><span>医学简史 · 2400年</span><span class="n" id="cnt">01<i> / 10</i></span></div>
+    <div id="year" class="abs">
+      <div id="pre"></div>
+      <div id="digits"><span id="nian">年</span></div>
+    </div>
+    <div id="iconWrap" class="abs">
+      <svg id="ring" viewBox="-260 -260 520 520" width="520" height="520"></svg>
+      <svg id="icon" viewBox="0 0 400 400" width="440" height="440"></svg>
+    </div>
+    <div id="title" class="abs txt"></div>
+    <div id="sub" class="abs txt"></div>
+    <svg id="tl" class="abs" width="1080" height="140"></svg>
+  </div>
+
+  <div id="intro" class="abs">
+    <div id="i30" class="abs txt">30<small>秒</small></div>
+    <div id="iMain" class="abs txt">看完2400年医学史</div>
+    <div id="iSub" class="abs txt">从巫术到mRNA疫苗</div>
+  </div>
+
+  <div id="outro" class="abs">
+    <div id="oHdr" class="abs txt">全球人均预期寿命</div>
+    <div id="oNum" class="abs txt"><span id="oVal">29</span><small>岁</small></div>
+    <div id="oYear" class="abs txt">1800年</div>
+    <svg id="chart" class="abs" width="900" height="440"></svg>
+    <div id="oFinal" class="abs txt">下一个突破，会是什么？</div>
+    <div id="oSrc" class="abs txt">寿命数据：Our World in Data</div>
+  </div>
+
+  <svg id="ecg" class="abs" width="1080" height="300"></svg>
+  <div id="vig" class="abs"></div>
+  <div id="black" class="abs"></div>
+</div>
+
+<script>
+// ───────────────────────── 时间轴 ─────────────────────────
+const W = 1080, H = 1920;
+const T0 = 2.2, D = 2.3, TO = T0 + 10 * D;   // 片头 0–2.2s，10 个里程碑各 2.3s，片尾 25.2–30s
+const C = '#3ef2d0', C2 = '#c8fff3', WARM = '#ffc86b';
+
+const MS = [
+  { y: -400, pre: '约公元前', lab: '前400', title: '西方医学之父希波克拉底', sub: '疾病源于自然，而非神罚', icon: 'rod' },
+  { y: 200,  pre: '约公元',   lab: '200',   title: '张仲景著《伤寒杂病论》', sub: '奠定中医辨证论治', icon: 'slips' },
+  { y: 1543, pre: '', lab: '1543', title: '维萨里出版《人体构造》', sub: '现代解剖学由此诞生', icon: 'skull' },
+  { y: 1796, pre: '', lab: '1796', title: '詹纳发明牛痘接种', sub: '<b>184</b>年后，天花被彻底消灭', icon: 'syringe' },
+  { y: 1846, pre: '', lab: '1846', title: '乙醚麻醉首次公开演示', sub: '外科手术从此告别剧痛', icon: 'flask' },
+  { y: 1895, pre: '', lab: '1895', title: '伦琴发现X射线', sub: '人类第一次看见身体内部', icon: 'xray' },
+  { y: 1928, pre: '', lab: '1928', title: '弗莱明发现青霉素', sub: '抗生素时代由此开启', icon: 'petri' },
+  { y: 1953, pre: '', lab: '1953', title: 'DNA双螺旋结构揭晓', sub: '打开分子生物学的大门', icon: 'dna' },
+  { y: 1972, pre: '', lab: '1972', title: '屠呦呦团队发现青蒿素', sub: '挽救全球数百万疟疾患者', icon: 'plant' },
+  { y: 2020, pre: '', lab: '2020', title: 'mRNA疫苗获批使用', sub: '不到一年，新冠疫苗问世', icon: 'virus' },
+];
+
+// 心跳：大拍对应里程碑切换（带“嘀”声），小拍在两者之间
+const BIG = [0.15, ...MS.map((_, i) => T0 + i * D), TO, 27.9];
+const SMALL = [1.18, ...MS.map((_, i) => T0 + i * D + 1.15), 26.15, 27.05, 28.75, 29.55];
+const BEATS = [...BIG.map(t => ({ t, a: 1 })), ...SMALL.map(t => ({ t, a: 0.55 }))].sort((a, b) => a.t - b.t);
+window.BEATS = { big: BIG, small: SMALL };
+
+// ───────────────────────── 工具 ─────────────────────────
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eOut = k => 1 - Math.pow(1 - k, 3);
+const eInOut = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const eBack = k => { const c1 = 1.70158, c3 = c1 + 1; return 1 + c3 * Math.pow(k - 1, 3) + c1 * Math.pow(k - 1, 2); };
+const g = (x, s) => Math.exp(-x * x / (2 * s * s));
+const f = n => +n.toFixed(1);
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const mk = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
+
+const circ = (cx, cy, r) => `M${f(cx - r)} ${f(cy)}a${r} ${r} 0 1 0 ${2 * r} 0a${r} ${r} 0 1 0 ${-2 * r} 0`;
+const ell = (cx, cy, rx, ry) => `M${cx - rx} ${cy}a${rx} ${ry} 0 1 0 ${2 * rx} 0a${rx} ${ry} 0 1 0 ${-2 * rx} 0`;
+const rrect = (x, y, w, h, r) => `M${x + r} ${y}H${x + w - r}Q${x + w} ${y} ${x + w} ${y + r}V${y + h - r}Q${x + w} ${y + h} ${x + w - r} ${y + h}H${x + r}Q${x} ${y + h} ${x} ${y + h - r}V${y + r}Q${x} ${y} ${x + r} ${y}Z`;
+const almond = (x1, y1, x2, y2, w) => {
+  const mx = (x1 + x2) / 2, my = (y1 + y2) / 2, dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy), nx = -dy / L * w, ny = dx / L * w;
+  return `M${f(x1)} ${f(y1)}Q${f(mx + nx)} ${f(my + ny)} ${f(x2)} ${f(y2)}Q${f(mx - nx)} ${f(my - ny)} ${f(x1)} ${f(y1)}Z`;
+};
+
+// ───────────────────────── 图标（400×400 线稿） ─────────────────────────
+const ICONS = {
+  rod() { // 蛇杖
+    return [
+      { d: 'M200 52L200 356', w: 10, s: 0 },
+      { d: circ(200, 44, 9), s: .05, fill: C, fo: .5 },
+      { d: 'M196 336C128 320 130 278 200 266C270 254 270 214 200 204C130 194 130 154 200 142C258 132 264 104 232 90', w: 9, s: .15 },
+      { d: ell(220, 86, 17, 11), tr: 'rotate(-18 220 86)', s: .55, fill: C, fo: .35 },
+      { d: 'M204 90L188 90L181 83', w: 3.5, s: .62, col: WARM },
+      { d: 'M188 90L181 97', w: 3.5, s: .62, col: WARM },
+      { d: circ(226, 83, 2.5), s: .6, w: 2, col: WARM, fill: WARM, fo: 1 },
+    ];
+  },
+  slips() { // 竹简
+    const E = [];
+    for (let i = 0; i < 7; i++) E.push({ d: rrect(86 + i * 33, 66, 28, 268, 7), s: i * .05, w: 5 });
+    E.push({ d: 'M66 126C150 116 250 136 334 126', s: .4, w: 5, col: WARM });
+    E.push({ d: 'M66 274C150 264 250 284 334 274', s: .45, w: 5, col: WARM });
+    for (let i = 0; i < 7; i++) for (let r = 0; r < 3; r++) {
+      const x = 100 + i * 33, y = 152 + r * 38;
+      E.push({ d: `M${x} ${y}L${x} ${y + (r % 2 ? 14 : 22)}`, s: .5 + i * .03 + r * .02, w: 4, op: .55, col: C2 });
+    }
+    return E;
+  },
+  skull() { // 颅骨
+    const E = [
+      { d: 'M126 214C112 104 288 104 274 214C271 240 258 254 250 266L250 300Q250 312 238 312L162 312Q150 312 150 300L150 266C142 254 129 240 126 214Z', w: 7, s: 0, fill: C, fo: .08 },
+      { d: ell(168, 212, 25, 21), s: .3, fill: C, fo: .3 },
+      { d: ell(232, 212, 25, 21), s: .35, fill: C, fo: .3 },
+      { d: 'M200 234L186 262Q200 270 214 262Z', s: .45, w: 5 },
+      { d: 'M158 284L242 284', s: .55, w: 4 },
+      { d: 'M200 118C194 140 208 152 200 176', s: .7, w: 3, op: .5, col: C2 },
+    ];
+    [170, 185, 200, 215, 230].forEach((x, j) => E.push({ d: `M${x} 284L${x} 306`, w: 4, s: .6 + j * .03 }));
+    return E;
+  },
+  syringe() { // 注射器
+    const E = [
+      { d: rrect(172, 196, 56, 86, 4), s: .5, noStroke: true, fill: C, fo: .35 },
+      { d: rrect(168, 118, 64, 168, 8), s: 0, w: 7 },
+      { d: 'M146 118L254 118', s: .1, w: 8 },
+      { d: 'M200 118L200 64', s: .18, w: 8 },
+      { d: 'M172 62L228 62', s: .25, w: 9 },
+      { d: 'M168 150L190 150', s: .3, w: 4, col: C2 },
+      { d: 'M168 180L184 180', s: .33, w: 4, col: C2 },
+      { d: 'M168 210L190 210', s: .36, w: 4, col: C2 },
+      { d: 'M168 240L184 240', s: .39, w: 4, col: C2 },
+      { d: 'M188 286L212 286L206 304L194 304Z', s: .4, w: 5 },
+      { d: 'M200 304L200 364', s: .5, w: 4 },
+      { d: 'M200 372C193 382 192 390 200 390C208 390 207 382 200 372Z', s: .75, w: 3, col: WARM, fill: WARM, fo: .8 },
+    ];
+    E.forEach(e => e.tr = 'rotate(45 200 200)');
+    return E;
+  },
+  flask() { // 烧瓶（乙醚）
+    return [
+      { d: 'M124 262C150 252 170 272 200 262C230 252 250 272 276 262C281 280 274 296 260 306C224 344 176 344 140 306C126 296 119 280 124 262Z', noStroke: true, fill: C, fo: .3, s: .55 },
+      { d: 'M176 98L176 176C118 196 100 262 140 306C176 344 224 344 260 306C300 262 282 196 224 176L224 98', w: 7, s: 0 },
+      { d: 'M162 98L238 98', w: 8, s: .2 },
+      { d: 'M124 262C150 252 170 272 200 262C230 252 250 272 276 262', w: 4, s: .4, col: C2 },
+      { d: circ(168, 292, 7), w: 3, s: .6, col: C2 },
+      { d: circ(214, 304, 5), w: 3, s: .65, col: C2 },
+      { d: circ(236, 284, 6), w: 3, s: .7, col: C2 },
+      { d: 'M188 84C174 68 202 58 188 42C178 30 190 22 186 12', w: 4, s: .6, op: .75, col: WARM },
+      { d: 'M212 84C226 68 198 58 212 42C222 30 210 22 214 12', w: 4, s: .68, op: .75, col: WARM },
+    ];
+  },
+  xray() { // 胸片
+    const E = [{ d: rrect(78, 50, 244, 300, 20), w: 4, op: .5, s: 0, col: C2 }];
+    E.push({ d: 'M188 102C160 92 130 94 108 106', w: 6, s: .1 });
+    E.push({ d: 'M212 102C240 92 270 94 292 106', w: 6, s: .1 });
+    for (let k = 0; k < 9; k++) E.push({ d: rrect(191, 96 + k * 25, 18, 19, 5), w: 4, s: .08 + k * .03, col: C2 });
+    for (let k = 0; k < 6; k++) {
+      const y = 126 + k * 29, sc = 1 - k * .06;
+      E.push({ d: `M190 ${y}C${f(190 - 40 * sc)} ${y - 14} ${f(190 - 82 * sc)} ${y + 2} ${f(190 - 78 * sc)} ${f(y + 44 * sc)}`, w: 6, s: .25 + k * .06 });
+      E.push({ d: `M210 ${y}C${f(210 + 40 * sc)} ${y - 14} ${f(210 + 82 * sc)} ${y + 2} ${f(210 + 78 * sc)} ${f(y + 44 * sc)}`, w: 6, s: .25 + k * .06 });
+    }
+    E.push({ id: 'scan', d: 'M84 60L316 60', w: 3, s: .3, col: WARM, op: .8 });
+    return E;
+  },
+  petri() { // 培养皿：青霉菌周围的抑菌圈
+    const E = [{ d: circ(200, 200, 150), w: 7, s: 0 }, { d: circ(200, 200, 136), w: 3, op: .5, s: .1, col: C2 }];
+    E.push({ d: circ(186, 190, 78), w: 3, op: .55, s: .35, col: WARM });
+    let d = '';
+    for (let a = 0; a <= 64; a++) {
+      const th = a / 64 * Math.PI * 2, r = 42 + 6 * Math.sin(5 * th) + 4 * Math.sin(3 * th + 1);
+      d += (a ? 'L' : 'M') + f(186 + r * Math.cos(th)) + ' ' + f(190 + r * Math.sin(th));
+    }
+    E.push({ d: d + 'Z', w: 5, s: .2, col: WARM, fill: WARM, fo: .3 });
+    [[118, 118, 7], [150, 92, 5], [262, 96, 8], [298, 150, 6], [312, 214, 7], [292, 276, 5], [244, 306, 8], [190, 314, 6],
+     [132, 292, 7], [92, 252, 5], [84, 178, 6], [300, 238, 4], [214, 80, 5], [160, 300, 4]]
+      .forEach(([x, y, r], j) => E.push({ d: circ(x, y, r), w: 3, s: .4 + j * .025, fill: C, fo: .5 }));
+    return E;
+  },
+  dna() { // 双螺旋（每帧旋转）
+    const E = [{ id: 'dnaA', d: '', w: 7, s: 0 }, { id: 'dnaB', d: '', w: 7, s: .1, col: C2 }];
+    for (let j = 0; j < 16; j++) E.push({ id: 'rung' + j, d: '', w: 4, s: .25 + j * .03, col: j % 2 ? WARM : C, op: .75 });
+    return E;
+  },
+  plant() { // 青蒿
+    const E = [{ d: 'M200 360C194 300 208 230 200 160C195 116 202 84 204 50', w: 7, s: 0 }];
+    const frond = (bx, by, ang, L, s) => {
+      const tx = bx + L * Math.cos(ang), ty = by + L * Math.sin(ang);
+      E.push({ d: `M${f(bx)} ${f(by)}L${f(tx)} ${f(ty)}`, w: 4, s });
+      [.32, .52, .72, .9].forEach((q, k) => {
+        const px = bx + (tx - bx) * q, py = by + (ty - by) * q, l = L * .3 * (1 - q * .45);
+        [-1, 1].forEach(sg => { const a2 = ang + sg * .95; E.push({ d: almond(px, py, px + l * Math.cos(a2), py + l * Math.sin(a2), l * .28), w: 2.5, s: s + .08 + k * .03, fill: C, fo: .35 }); });
+      });
+      E.push({ d: almond(tx, ty, tx + L * .18 * Math.cos(ang), ty + L * .18 * Math.sin(ang), L * .06), w: 2.5, s: s + .2, fill: C, fo: .35 });
+    };
+    [[318, 95], [268, 86], [220, 76], [172, 64], [128, 52], [92, 38]].forEach(([y, L], k) => {
+      frond(201, y, -.45, L, .08 + k * .07);
+      frond(199, y - 18, Math.PI + .45, L * .95, .1 + k * .07);
+    });
+    [[204, 42, 6], [190, 54, 5], [218, 56, 5], [196, 68, 4], [214, 72, 4]].forEach(([x, y, r], j) => E.push({ d: circ(x, y, r), w: 2, s: .75 + j * .03, col: WARM, fill: WARM, fo: .9 }));
+    return E;
+  },
+  virus() { // 病毒 + mRNA 链
+    const E = [{ d: circ(200, 168, 70), w: 7, s: 0, fill: C, fo: .12 }];
+    for (let j = 0; j < 12; j++) {
+      const a = j / 12 * Math.PI * 2, co = Math.cos(a), si = Math.sin(a);
+      E.push({ d: `M${f(200 + 70 * co)} ${f(168 + 70 * si)}L${f(200 + 97 * co)} ${f(168 + 97 * si)}`, w: 5, s: .15 + j * .02 });
+      E.push({ d: circ(200 + 106 * co, 168 + 106 * si, 9), w: 4, s: .2 + j * .02, col: WARM, fill: WARM, fo: .5 });
+    }
+    E.push({ d: circ(178, 150, 11), w: 3, s: .4, op: .6, col: C2 });
+    E.push({ d: circ(222, 182, 8), w: 3, s: .45, op: .6, col: C2 });
+    E.push({ d: circ(190, 198, 6), w: 3, s: .5, op: .6, col: C2 });
+    const wy = x => 334 - 16 * Math.sin(2 * Math.PI * (x - 54) / 110);
+    let d = ''; for (let x = 54; x <= 346; x += 4) d += (x === 54 ? 'M' : 'L') + x + ' ' + f(wy(x));
+    E.push({ d, w: 6, s: .45 });
+    for (let x = 62, j = 0; x <= 340; x += 14, j++) E.push({ d: `M${x} ${f(wy(x))}L${x} ${f(wy(x) + 22)}`, w: 4, s: .6 + j * .012, col: j % 2 ? WARM : C2 });
+    return E;
+  },
+};
+
+// ───────────────────────── 构建 DOM ─────────────────────────
+const icon = $('icon');
+const defs = mk('defs', {}, icon);
+const flt = mk('filter', { id: 'glow', x: '-25%', y: '-25%', width: '150%', height: '150%' }, defs);
+mk('feGaussianBlur', { stdDeviation: 7, result: 'b' }, flt);
+const fm = mk('feMerge', {}, flt); mk('feMergeNode', { in: 'b' }, fm); mk('feMergeNode', { in: 'SourceGraphic' }, fm);
+
+const groups = MS.map((m, i) => {
+  const gEl = mk('g', { filter: 'url(#glow)', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }, icon);
+  gEl.style.display = 'none';
+  const els = ICONS[m.icon]().map(e => {
+    const p = mk('path', { d: e.d, fill: 'none' }, gEl);
+    if (e.tr) p.setAttribute('transform', e.tr);
+    if (!e.noStroke) {
+      p.setAttribute('stroke', e.col || C);
+      p.setAttribute('stroke-width', e.w || 6);
+      p.setAttribute('pathLength', 1);
+      p.setAttribute('stroke-dasharray', '1 1');
+    }
+    if (e.fill) p.setAttribute('fill', e.fill);
+    return { ...e, el: p };
+  });
+  const byId = {}; els.forEach(e => { if (e.id) byId[e.id] = e.el; });
+  return { g: gEl, els, byId };
+});
+
+// 旋转装饰环
+const ring = $('ring');
+mk('circle', { r: 246, fill: 'none', stroke: 'rgba(62,242,208,.16)', 'stroke-width': 2 }, ring);
+const ringA = mk('g', {}, ring);
+mk('circle', { r: 232, fill: 'none', stroke: 'rgba(62,242,208,.38)', 'stroke-width': 2, 'stroke-dasharray': '2 12' }, ringA);
+const ringB = mk('g', {}, ring);
+const arc = (r, a0, a1) => `M${f(r * Math.cos(a0))} ${f(r * Math.sin(a0))}A${r} ${r} 0 0 1 ${f(r * Math.cos(a1))} ${f(r * Math.sin(a1))}`;
+[0, Math.PI].forEach(o => mk('path', { d: arc(246, o, o + 1.0), fill: 'none', stroke: C, 'stroke-width': 5, 'stroke-linecap': 'round', opacity: .8 }, ringB));
+[0, 1, 2, 3].forEach(k => { const a = k * Math.PI / 2; mk('path', { d: `M${f(254 * Math.cos(a))} ${f(254 * Math.sin(a))}L${f(240 * Math.cos(a))} ${f(240 * Math.sin(a))}`, stroke: C2, 'stroke-width': 3, opacity: .6 }, ring); });
+
+// 年份滚轮
+const digitsEl = $('digits');
+const slots = [0, 1, 2, 3].map(c => {
+  const s = document.createElement('div'); s.className = 'slot';
+  const st = document.createElement('div'); st.className = 'strip';
+  for (let r = 0; r < 3; r++) for (let d = 0; d < 10; d++) { const x = document.createElement('div'); x.textContent = d; st.appendChild(x); }
+  s.appendChild(st); digitsEl.insertBefore(s, $('nian'));
+  return { s, st, blur: document.querySelector(`#vb${c} feGaussianBlur`) };
+});
+const DIG_H = 230 * 1.4, DIG_OFF = -.221 * 230, SLOT_W = 230 * .6;  // 行高 1.4em，让相邻数字拉开距离
+const digs = v => [Math.floor(v / 1000) % 10, Math.floor(v / 100) % 10, Math.floor(v / 10) % 10, v % 10];
+
+// 底部时间轴
+const tl = $('tl');
+const TLX = j => 90 + j * 100;
+mk('line', { x1: 90, x2: 990, y1: 46, y2: 46, stroke: 'rgba(255,255,255,.14)', 'stroke-width': 3 }, tl);
+const tlFill = mk('line', { x1: 90, x2: 90, y1: 46, y2: 46, stroke: C, 'stroke-width': 4, 'stroke-linecap': 'round' }, tl);
+const tlPulse = mk('circle', { cx: 90, cy: 46, r: 12, fill: 'none', stroke: C, 'stroke-width': 3 }, tl);
+const tlNodes = MS.map((m, j) => ({
+  c: mk('circle', { cx: TLX(j), cy: 46, r: 7 }, tl),
+  t: (() => { const t = mk('text', { x: TLX(j), y: 96, 'text-anchor': 'middle', 'font-size': 23, 'font-weight': 700, 'font-family': 'NS' }, tl); t.textContent = m.lab; return t; })(),
+}));
+
+// 心电图
+const ecg = $('ecg');
+const eDefs = mk('defs', {}, ecg);
+const lg = mk('linearGradient', { id: 'eg', gradientUnits: 'userSpaceOnUse', x1: 0, x2: 820, y1: 0, y2: 0 }, eDefs);
+mk('stop', { offset: 0, 'stop-color': C, 'stop-opacity': 0 }, lg);
+mk('stop', { offset: .55, 'stop-color': C, 'stop-opacity': .55 }, lg);
+mk('stop', { offset: 1, 'stop-color': C, 'stop-opacity': 1 }, lg);
+const ef = mk('filter', { id: 'eglow', x: '-10%', y: '-50%', width: '120%', height: '200%' }, eDefs);
+mk('feGaussianBlur', { stdDeviation: 5, result: 'b' }, ef);
+const efm = mk('feMerge', {}, ef); mk('feMergeNode', { in: 'b' }, efm); mk('feMergeNode', { in: 'SourceGraphic' }, efm);
+mk('line', { x1: 832, x2: 1080, y1: 190, y2: 190, stroke: 'rgba(62,242,208,.18)', 'stroke-width': 2, 'stroke-dasharray': '6 10' }, ecg);
+const ePath = mk('polyline', { fill: 'none', stroke: 'url(#eg)', 'stroke-width': 5, 'stroke-linejoin': 'round', filter: 'url(#eglow)' }, ecg);
+const eHalo = mk('circle', { r: 22, fill: C, opacity: .25 }, ecg);
+const eHead = mk('circle', { r: 8, fill: '#fff', filter: 'url(#eglow)' }, ecg);
+const XN = 820, V = 560, YC = 190, AMP = 140;
+function sig(tau) {
+  let s = 0;
+  for (const b of BEATS) {
+    const d = tau - b.t; if (d < -0.3 || d > 0.45) continue;
+    s += b.a * (0.12 * g(d + .16, .025) - 0.12 * g(d + .028, .008) + g(d, .012) - 0.28 * g(d - .026, .009) + 0.22 * g(d - .24, .045));
+  }
+  return s + 0.012 * Math.sin(tau * 37) + 0.008 * Math.sin(tau * 91);
+}
+
+// 片尾：寿命曲线（Our World in Data 全球人均预期寿命，取整点近似）
+const LE = [[1800, 28.5], [1850, 29.3], [1900, 32], [1913, 34.1], [1950, 46.5], [1970, 56.5], [1990, 64], [2000, 66.5], [2010, 70.1], [2019, 72.8], [2023, 73.2]];
+const leAt = yr => { for (let j = 1; j < LE.length; j++) if (yr <= LE[j][0]) { const [a, va] = LE[j - 1], [b, vb] = LE[j]; return lerp(va, vb, (yr - a) / (b - a)); } return LE[LE.length - 1][1]; };
+const chart = $('chart');
+const cDefs = mk('defs', {}, chart);
+const ag = mk('linearGradient', { id: 'ag', x1: 0, x2: 0, y1: 0, y2: 1 }, cDefs);
+mk('stop', { offset: 0, 'stop-color': WARM, 'stop-opacity': .35 }, ag);
+mk('stop', { offset: 1, 'stop-color': WARM, 'stop-opacity': 0 }, ag);
+const CX = yr => 30 + (yr - 1800) / 223 * 840, CY = v => 380 - (v - 20) / 60 * 340;
+[30, 50, 70].forEach(v => {
+  mk('line', { x1: 30, x2: 870, y1: CY(v), y2: CY(v), stroke: 'rgba(255,255,255,.08)', 'stroke-width': 2 }, chart);
+  const t = mk('text', { x: 24, y: CY(v) + 8, 'text-anchor': 'end', 'font-size': 22, fill: 'rgba(255,255,255,.35)', 'font-family': 'NS' }, chart); t.textContent = v;
+});
+mk('line', { x1: 30, x2: 870, y1: 382, y2: 382, stroke: 'rgba(255,255,255,.3)', 'stroke-width': 2 }, chart);
+[[1800, 'start'], [1900, 'middle'], [2023, 'end']].forEach(([yr, an]) => {
+  const t = mk('text', { x: CX(yr), y: 420, 'text-anchor': an, 'font-size': 28, 'font-weight': 700, fill: 'rgba(255,255,255,.55)', 'font-family': 'NS' }, chart); t.textContent = yr;
+});
+const cArea = mk('path', { fill: 'url(#ag)' }, chart);
+const cLine = mk('path', { fill: 'none', stroke: WARM, 'stroke-width': 6, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', filter: 'url(#glow2)' }, chart);
+const f2 = mk('filter', { id: 'glow2', x: '-10%', y: '-30%', width: '120%', height: '160%' }, cDefs);
+mk('feGaussianBlur', { stdDeviation: 6, result: 'b' }, f2);
+const f2m = mk('feMerge', {}, f2); mk('feMergeNode', { in: 'b' }, f2m); mk('feMergeNode', { in: 'SourceGraphic' }, f2m);
+const cHalo = mk('circle', { r: 20, fill: WARM, opacity: .3 }, chart);
+const cHead = mk('circle', { r: 9, fill: '#fff' }, chart);
+
+// 漂浮粒子
+const ctx = $('parts').getContext('2d');
+let seed = 7; const rnd = () => (seed = seed * 16807 % 2147483647) / 2147483647;
+const PR = Array.from({ length: 70 }, () => ({ x: rnd() * W, y: rnd() * H, v: 10 + rnd() * 40, r: 1 + rnd() * 2.6, ph: rnd() * 6.28, a: .12 + rnd() * .4 }));
+
+// ───────────────────────── 每帧渲染 ─────────────────────────
+function setOp(el, o) { el.style.opacity = o; el.style.visibility = o <= 0.001 ? 'hidden' : 'visible'; }
+
+function render(t) {
+  // 背景
+  let flash = 0; for (const b of BIG) if (t >= b) flash = Math.max(flash, Math.exp(-(t - b) / .28));
+  $('grid').style.backgroundPosition = `0 ${f(-t * 18)}px`;
+  $('halo').style.opacity = .5 + .5 * flash;
+  $('halo').style.transform = `scale(${f((1 + .08 * flash) * 1000) / 1000})`;
+  ctx.clearRect(0, 0, W, H);
+  for (const p of PR) {
+    const y = ((p.y - p.v * t) % H + H) % H, x = p.x + 14 * Math.sin(t * .6 + p.ph);
+    ctx.fillStyle = `rgba(62,242,208,${(p.a * (.6 + .4 * Math.sin(t * 2 + p.ph))).toFixed(3)})`;
+    ctx.beginPath(); ctx.arc(x, y, p.r, 0, 6.283); ctx.fill();
+  }
+
+  // 心电图
+  let pts = '';
+  for (let x = 0; x <= XN; x += 2) pts += x + ',' + f(YC - AMP * sig(t - (XN - x) / V)) + ' ';
+  ePath.setAttribute('points', pts);
+  const hy = f(YC - AMP * sig(t));
+  eHead.setAttribute('cx', XN); eHead.setAttribute('cy', hy);
+  eHalo.setAttribute('cx', XN); eHalo.setAttribute('cy', hy);
+  eHalo.setAttribute('r', f(18 + 16 * flash));
+
+  // 片头
+  const introEl = $('intro');
+  if (t < T0 + .1) {
+    setOp(introEl, 1);
+    const xi = eInOut(clamp((t - 1.85) / .35));
+    [['i30', .15, 1.4], ['iMain', .32, 1.15], ['iSub', .52, 1.1]].forEach(([id, d0, s0]) => {
+      const a = clamp((t - d0) / .42), el = $(id);
+      el.style.opacity = eOut(a) * (1 - xi);
+      el.style.transform = `translateY(${f(-60 * xi)}px) scale(${f(lerp(s0, 1, eBack(a)) * 1000) / 1000 * (1 + .03 * t / 2)})`;
+      el.style.filter = a < 1 ? `blur(${f((1 - a) * 18)}px)` : 'none';
+    });
+  } else setOp(introEl, 0);
+
+  // 里程碑
+  const main = $('main');
+  const mIn = clamp((t - T0 + .05) / .35), mOut = clamp((t - TO + .15) / .4);
+  setOp(main, eOut(mIn) * (1 - mOut));
+  if (t >= T0 - .1 && t < TO + .5) {
+    const i = Math.max(0, Math.min(9, Math.floor((t - T0) / D)));
+    const u = t - T0 - i * D;
+    const m = MS[i];
+    const x = eInOut(clamp((u - (D - .3)) / .3));
+
+    $('cnt').firstChild.nodeValue = String(i + 1).padStart(2, '0');
+
+    // 年份滚动
+    const prevV = i === 0 ? 0 : Math.abs(MS[i - 1].y), curV = Math.abs(m.y);
+    const dO = digs(prevV), dN = digs(curV);
+    slots.forEach((sl, c) => {
+      const kAt = uu => eOut(clamp((uu - .04 * c) / .62));
+      const kc = kAt(u);
+      let delta = (dN[c] - dO[c] + 10) % 10; if (c >= 2) delta += 10;
+      const P = i === 0 && u < 0 ? dN[c] : dO[c] + delta * kc;
+      sl.st.style.transform = `translateY(${f(-P * DIG_H + DIG_OFF)}px)`;
+      // 竖直运动模糊：按本帧与上一帧的位移计算
+      const speed = Math.abs(delta * (kc - kAt(u - 1 / 30))) * DIG_H;
+      const bl = Math.min(14, speed * .2);
+      sl.blur.setAttribute('stdDeviation', `0 ${f(bl)}`);
+      sl.st.style.filter = bl > .3 ? `url(#vb${c})` : 'none';
+      if (c === 0) {
+        const lead = lerp(prevV >= 1000 ? 1 : 0, curV >= 1000 ? 1 : 0, kc);
+        sl.s.style.width = f(SLOT_W * lead) + 'px'; sl.s.style.opacity = lead;
+      }
+    });
+    const nextPre = i < 9 ? MS[i + 1].pre : '';
+    $('pre').textContent = m.pre;
+    $('pre').style.opacity = m.pre ? clamp(u / .25) * (nextPre !== m.pre ? 1 - x : 1) : 0;
+    $('year').style.transform = `scale(${f((1 + .035 * flash) * 1000) / 1000})`;
+
+    // 图标
+    groups.forEach((gr, j) => { gr.g.style.display = j === i ? '' : 'none'; });
+    const gr = groups[i];
+    const P = clamp((u - .08) / .8) * 1.2;
+    if (m.icon === 'dna') {
+      const phi = t * 1.8;
+      let a = '', b = '';
+      for (let y = 46; y <= 354; y += 4) {
+        const s = Math.sin(2 * Math.PI * (y - 46) / 154 + phi);
+        a += (y === 46 ? 'M' : 'L') + f(200 + 78 * s) + ' ' + y; b += (y === 46 ? 'M' : 'L') + f(200 - 78 * s) + ' ' + y;
+      }
+      gr.byId.dnaA.setAttribute('d', a); gr.byId.dnaB.setAttribute('d', b);
+      for (let j = 0; j < 16; j++) {
+        const y = 56 + j * 19, s = Math.sin(2 * Math.PI * (y - 46) / 154 + phi);
+        gr.byId['rung' + j].setAttribute('d', `M${f(200 + 70 * s)} ${y}L${f(200 - 70 * s)} ${y}`);
+      }
+    }
+    if (m.icon === 'xray') { const y = f(60 + (u * 190) % 280); gr.byId.scan.setAttribute('d', `M84 ${y}L316 ${y}`); }
+    gr.els.forEach(e => {
+      const p = clamp((P - e.s) / .4);
+      if (!e.noStroke) {
+        e.el.setAttribute('stroke-dashoffset', f((1 - p) * 1000) / 1000);
+        e.el.setAttribute('stroke-opacity', p <= 0 ? 0 : (e.op || 1));
+      }
+      if (e.fill) e.el.setAttribute('fill-opacity', f(clamp((P - e.s - .25) / .3) * e.fo * 1000) / 1000);
+    });
+    const e = eOut(clamp(u / .45));
+    const bob = Math.sin(t * 2.2) * 6;
+    gr.g.style.opacity = 1 - x;
+    $('icon').style.transform = `translateY(${f(bob - 30 * x)}px) scale(${f((lerp(.86, 1, e) + .04 * flash + .06 * x) * 1000) / 1000})`;
+    ringA.setAttribute('transform', `rotate(${f(t * 14)})`);
+    ringB.setAttribute('transform', `rotate(${f(-t * 32)})`);
+    $('ring').style.transform = `scale(${f((1 + .05 * flash) * 1000) / 1000})`;
+
+    // 标题
+    const ta = eOut(clamp((u - .18) / .35)), sa = eOut(clamp((u - .36) / .35));
+    const title = $('title'), sub = $('sub');
+    if (title.dataset.i !== String(i)) { title.textContent = m.title; sub.innerHTML = m.sub; title.dataset.i = i; }
+    title.style.opacity = ta * (1 - x); title.style.transform = `translateY(${f(40 * (1 - ta) - 24 * x)}px)`;
+    sub.style.opacity = sa * (1 - x); sub.style.transform = `translateY(${f(34 * (1 - sa) - 24 * x)}px)`;
+    title.style.filter = ta < 1 ? `blur(${f((1 - ta) * 10)}px)` : 'none';
+
+    // 时间轴
+    const prog = i + eInOut(clamp(u / .6)) - 1;
+    tlFill.setAttribute('x2', f(TLX(Math.max(0, prog))));
+    tlNodes.forEach((n, j) => {
+      const on = j <= i, cur = j === i;
+      n.c.setAttribute('r', cur ? 10 : 7);
+      n.c.setAttribute('fill', on ? (cur ? '#fff' : C) : 'rgba(255,255,255,.22)');
+      n.t.setAttribute('fill', cur ? C : on ? 'rgba(255,255,255,.6)' : 'rgba(255,255,255,.3)');
+    });
+    const pk = (u % 1.15) / 1.15;
+    tlPulse.setAttribute('cx', TLX(i)); tlPulse.setAttribute('r', f(10 + 22 * pk)); tlPulse.setAttribute('opacity', f(.8 * (1 - pk) * 100) / 100);
+  }
+
+  // 片尾
+  const o = t - TO;
+  const outro = $('outro');
+  if (o > -.1) {
+    setOp(outro, 1);
+    const hA = eOut(clamp((o - .15) / .4));
+    $('oHdr').style.opacity = hA; $('oHdr').style.transform = `translateY(${f(30 * (1 - hA))}px)`;
+    const nA = eOut(clamp((o - .3) / .4));
+    const k = eInOut(clamp((o - .4) / 2.2));
+    const yr = 1800 + 223 * k, v = k >= 1 ? 73 : Math.max(29, Math.round(leAt(yr)));
+    $('oVal').textContent = v;
+    $('oNum').style.opacity = nA; $('oNum').style.transform = `scale(${f((lerp(1.25, 1, eBack(nA)) + (o > 2.6 ? .04 * flash : 0)) * 1000) / 1000})`;
+    $('oYear').textContent = Math.round(yr) + '年';
+    $('oYear').style.opacity = nA;
+    let d = '', a = '';
+    const endYr = Math.max(1800.5, yr);
+    for (let y = 1800; y <= endYr; y += 2) d += (y === 1800 ? 'M' : 'L') + f(CX(y)) + ' ' + f(CY(leAt(y)));
+    d += 'L' + f(CX(endYr)) + ' ' + f(CY(leAt(endYr)));
+    a = d + `L${f(CX(endYr))} 382L${CX(1800)} 382Z`;
+    cLine.setAttribute('d', d); cArea.setAttribute('d', a);
+    cHead.setAttribute('cx', f(CX(endYr))); cHead.setAttribute('cy', f(CY(leAt(endYr))));
+    cHalo.setAttribute('cx', f(CX(endYr))); cHalo.setAttribute('cy', f(CY(leAt(endYr)))); cHalo.setAttribute('r', f(16 + 18 * flash));
+    $('chart').style.opacity = nA;
+    const fA = eOut(clamp((o - 2.7) / .45));
+    $('oFinal').style.opacity = fA; $('oFinal').style.transform = `translateY(${f(40 * (1 - fA))}px) scale(${f(lerp(1.12, 1, fA) * 1000) / 1000})`;
+    $('oFinal').style.filter = fA < 1 ? `blur(${f((1 - fA) * 12)}px)` : 'none';
+    $('oSrc').style.opacity = eOut(clamp((o - 3.0) / .4));
+  } else setOp(outro, 0);
+
+  $('black').style.opacity = clamp((t - 29.45) / .55);
+}
+
+window.render = render;
+window.ready = (async () => {
+  const sample = document.body.innerText + MS.map(m => m.title + m.sub + m.pre + m.lab).join('') + '0123456789年岁';
+  await Promise.all(['400 40px NS', '700 40px NS', '900 40px NS', '700 40px SF', '900 40px SF'].map(fnt => document.fonts.load(fnt, sample)));
+  await document.fonts.ready;
+  render(0);
+  return true;
+})();
+</script>
+</body>
+</html>
