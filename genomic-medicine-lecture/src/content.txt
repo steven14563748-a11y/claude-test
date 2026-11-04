@@ -1,0 +1,522 @@
+# 讲义精读内容源文件
+# 格式：
+#   === 页码 | 部分编号 | 英文标题 || 中文标题
+#   行类型 原文 || 译文
+#   行类型：h 标题  p 段落  li 一级要点  l2 二级要点  fh 图中文字分组  f 图中文字  c 来源/链接  d 说明
+#   n 讲解标题 || 讲解内容
+# 行内标记：{{英文|中文释义}} 重点词  **粗体**  %%斜体%%  `代码`  [[文字|链接]]  _{下标} ^{上标}  @@DNA@@ 封面序列
+
+=== 1 | 0 | Accurate genome-wide variant effect prediction || 封面：精准的全基因组变异效应预测
+h Accurate {{genome-wide|全基因组范围的}} {{variant effect prediction|变异效应预测}} || 精准的全基因组变异效应预测
+p Imperial College London, 2026 || 伦敦帝国理工学院，2026 年
+p Jun Cheng — {{Research Scientist|研究科学家}}, Google DeepMind || Jun Cheng —— Google DeepMind 研究科学家
+fh 封面图
+f @@DNA@@ ↓ (protein structure) || 一段 DNA 序列（浅橙色高亮一段窗口，红色的 t 是发生变异的碱基），箭头指向一个蛋白质三维结构
+n 这门课在讲什么 || “变异效应预测”（variant effect prediction）是指：给定基因组上某个位置的碱基改变（例如 G 变成 A），用计算方法预测它会对分子功能（蛋白结构、基因表达、RNA 剪接等）乃至疾病风险产生什么影响。
+n “genome-wide”的含义 || 不只看占基因组约 1–2% 的蛋白编码区，而是覆盖整个基因组，包括 98% 以上的非编码区。本讲前半部分讲编码区（AlphaMissense），后半部分讲非编码区（AlphaGenome）。
+n 封面图的寓意 || 从“序列中的一个字母改变”推到“分子和蛋白层面的后果”，这正是整堂课的主线。
+
+=== 2 | 0 | Lecture overview | Today's agenda || 课程概览与今日议程
+h Lecture overview | Today's {{agenda|议程}} || 课程概览 | 今日议程
+li 01 · PART 1 · {{CLINICAL CONTEXT|临床背景}} — **Genetics & {{Rare Disease|罕见病}}** || 01 · 第一部分 · 临床背景 —— **遗传学与罕见病**
+l2 {{Genetic architecture|遗传结构}} of human disease, clinical {{variant tiering|变异分级}}, and why >50% of rare disease cases remain {{undiagnosed|未确诊的}}. || 人类疾病的遗传结构、临床上的变异分级，以及为什么超过 50% 的罕见病病例仍然无法确诊。
+li 02 · PART 2 · {{CODING VARIANTS|编码区变异}} — **AlphaMissense** || 02 · 第二部分 · 编码区变异 —— **AlphaMissense**
+l2 {{Leveraging|利用}} AlphaFold structure and {{evolutionary conservation|进化保守性}} to predict {{pathogenicity|致病性}} across all 71M human {{missense variants|错义变异}}. || 利用 AlphaFold 预测的蛋白结构和进化保守性，预测全部 7100 万个人类错义变异的致病性。
+li 03 · PART 3 · {{NON-CODING GENOME|非编码基因组}} — **AlphaGenome** || 03 · 第三部分 · 非编码基因组 —— **AlphaGenome**
+l2 {{Sequence-to-function|序列到功能}} deep learning {{uniting|结合}} 1 Mb DNA context with 1 bp {{resolution|分辨率}} across 11 {{regulatory|调控的}} {{modalities|模态（数据类型）}}. || 一种“由序列预测功能”的深度学习模型：同时兼顾 1 Mb（100 万碱基）的 DNA 上下文和 1 bp（单个碱基）的分辨率，覆盖 11 种调控数据模态。
+li 04 · PART 4 · GENOME-WIDE {{ATLAS|图谱}} — **AlphaGenome Atlas & AVI** || 04 · 第四部分 · 全基因组图谱 —— **AlphaGenome Atlas 与 AVI**
+l2 {{Unifying|统一}} coding and regulatory predictions across ~9B human {{SNVs|单核苷酸变异}} to {{prioritize|排定优先级}} and {{resolve|判定}} clinical {{VUS|意义未明的变异}}. || 把编码区和调控区的预测统一起来，覆盖约 90 亿个人类单核苷酸变异，用于对临床上意义未明的变异（VUS）进行优先排序和判定。
+p **Lecture Goal:** Understand how {{deep learning|深度学习}} predicts variant effects across coding proteins and the non-coding genome for {{genomic medicine|基因组医学}}. || **课程目标：**理解深度学习如何预测蛋白编码区和非编码基因组中的变异效应，并把它用于基因组医学。
+n 1 Mb 和 1 bp || Mb = megabase（兆碱基），即 100 万个碱基对；bp = base pair（碱基对）。“看得远”（1 Mb 上下文，能覆盖远端增强子）和“看得细”（单碱基分辨率）过去往往不可兼得，AlphaGenome 同时做到了这两点。
+n 71M 和 ~9B 这两个数字从哪来 || 71M（7100 万）是人类蛋白质组中所有“可由单个碱基替换产生”的错义变异数量。~9B（约 90 亿）≈ 人类基因组约 31 亿个位置 × 每个位置可换成的另外 3 种碱基，也就是全部可能的单核苷酸变异（SNV）。
+n VUS 是什么 || variant of uncertain (unknown) significance，意义未明的变异：检测到了，但现有证据不足以判断它是致病还是良性。它是临床基因检测报告中数量最多、也最让医生头疼的一类。
+n “11 种调控模态”指什么 || 指不同类型的分子测量数据，对应第 19 页表格中的 11 种输出：RNA-seq、CAGE、PRO-cap、DNase、ATAC、组蛋白修饰、转录因子结合、剪接位点、剪接连接、剪接位点使用率、DNA 接触图。
+
+=== 3 | 1 | Variant disease association || 变异与疾病的关联
+h Variant {{disease association|疾病关联}} || 变异与疾病的关联
+fh 图 A
+f {{Effect size|效应大小}} (y-axis) vs. {{Frequency|（变异在人群中的）频率}} (x-axis) || 纵轴：效应大小；横轴：频率
+f Top-left (coding): {{Monogenic diseases|单基因病}} || 左上（编码区为主）：单基因病
+f Bottom-right (non-coding): {{Common traits and diseases|常见性状与疾病}} || 右下（非编码区为主）：常见性状与疾病
+f {{SNP arrays|SNP 芯片}} · {{Exome seq|外显子组测序}} || SNP 芯片 · 外显子组测序（两种检测技术各自覆盖的范围）
+f Coding → Noncoding: {{Functional architecture|功能构成}} || 编码 → 非编码：功能构成（颜色由黄到红）
+fh 图 B
+f {{Effect prediction quality|效应预测质量}} || 效应预测质量（柱子越长，越容易预测）
+f {{Premature stop|提前终止}} · {{Splice site|剪接位点}} · {{Frameshift indel|移码插入/缺失}} · {{Splice region|剪接区域}} · Severe {{missense|错义}} · Other missense · {{Synonymous|同义}} || 提前终止 · 剪接位点 · 移码插入缺失 · 剪接区域 · 严重错义 · 其他错义 · 同义
+f {{UTR|非翻译区}} · {{Promoter|启动子}} · {{Proximal enhancer|近端增强子}} · {{Intron|内含子}} · Other {{enhancer|增强子}} · {{Unannotated|未注释区域}} || 非翻译区 · 启动子 · 近端增强子 · 内含子 · 其他增强子 · 未注释区域
+f {{Effect on protein|对蛋白的影响}}: Structure ↔ {{Dosage|剂量}} || 对蛋白的影响：结构 ↔ 剂量（色条由浅到深）
+c Lappalainen & MacArthur, %%Science%%, 2021 || 图片来源：Lappalainen & MacArthur，《Science》，2021
+n 图 A 怎么读 || 左上角是“罕见但效应大”的变异，导致单基因病（孟德尔遗传病），多位于编码区，通常靠外显子组测序发现；右下角是“常见但效应小”的变异，与常见复杂疾病（如 2 型糖尿病、身高）相关，多位于非编码区，主要靠 SNP 芯片加 GWAS 发现。灰色竖线表示 SNP 芯片只覆盖较常见的变异。
+n 为什么频率和效应大小呈反比 || 效应很大的有害变异会被自然选择（纯化选择）清除，很难在人群中变得常见；能变常见的，往往只是效应很小的变异。
+n 图 B 怎么读 || 列出不同类别变异的“效应有多容易预测”。提前终止、剪接位点、移码这类破坏性强的编码变异最容易预测；启动子、增强子、内含子和未注释区域的变异最难预测，这正是本讲后半部分 AlphaGenome 要解决的问题。左侧圆点的颜色对应图 A 的色带（黄 = 编码，红 = 非编码）；柱子的颜色表示该类变异主要改变蛋白的“结构”（浅色）还是“剂量”（深色）。
+n Dosage（剂量）是什么意思 || 指基因产物（RNA 或蛋白）的数量。非编码调控变异一般不改变蛋白序列，而是改变基因“表达多少”。
+
+=== 4 | 1 | Growth in the discovery of disease-associated genetic variation || 疾病相关遗传变异的发现历程
+h Growth in the discovery of {{disease-associated|与疾病相关的}} {{genetic variation|遗传变异}} || 疾病相关遗传变异的发现不断增长
+li {{Rare disease|罕见病}} || 罕见病
+l2 {{Human genome project|人类基因组计划}} || 人类基因组计划
+l2 {{High-throughput sequencing|高通量测序}} || 高通量测序
+li {{Common disease|常见病}} || 常见病
+l2 {{1000 genome project|千人基因组计划}} || 千人基因组计划
+l2 {{GWAS|全基因组关联研究}} || 全基因组关联研究（GWAS）
+l2 {{UK biobank|英国生物样本库}} || 英国生物样本库（UK Biobank）
+p More recent developments have brought a {{synthesis|融合}} of the rare- and common-variant {{approaches|研究路径}} || 近年来的进展让“罕见变异”和“常见变异”两条研究路径走向融合
+fh 时间线图
+f A brief history of human disease genetics, Claussnitzer et al. || 图题：人类疾病遗传学简史（Claussnitzer 等，《Nature》2020）
+f Left bars — Rare ({{monogenic|单基因的}}) disease: Genes {{harbouring|含有}} variants {{causal|致病的（因果的）}} for monogenic disease || 左侧柱：罕见（单基因）病，含有单基因病致病变异的基因数量
+f Right bars — Common ({{complex|复杂的（多基因的）}}) disease: Genome-wide {{significant|（统计学上）显著的}} association signals || 右侧柱：常见（复杂）病，全基因组显著关联信号的数量
+f Type of discovery: Resources · Technologies · Key findings || 发现类型：资源（橙）· 技术（浅橙）· 关键发现（蓝）
+f 2000: Draft human genome · 2005: {{Next-generation sequencing|二代测序}} · 2005: First GWAS || 2000：人类基因组草图 · 2005：二代测序 · 2005：第一项 GWAS
+f 2009: Clinical {{exome sequencing|外显子组测序}} · 2010: 1000 Genomes resource · 2011: Exome-based diagnosis in {{trios|三人家系（患者 + 父母）}} || 2009：临床外显子组测序 · 2010：千人基因组资源 · 2011：基于外显子组的三人家系诊断
+f 2013: Launch of ClinVar, ClinGen and Matchmaker Exchange · 2016: Population frequency variant database (ExAC) · 2017: UKBiobank GWAS completed || 2013：ClinVar、ClinGen 和 Matchmaker Exchange 上线 · 2016：人群频率变异数据库 ExAC · 2017：UK Biobank GWAS 完成
+f 2018: GWAS sample exceeding 1 million · 2018: {{Polygenic|多基因的}} contribution to rare diseases || 2018：GWAS 样本量突破 100 万 · 2018：发现多基因背景对罕见病也有贡献
+n GWAS 是什么、有什么局限 || 全基因组关联研究：在成千上万人中，比较病例与对照（或某个性状）在几十万到几百万个常见 SNP 上的频率差异，找出统计学上显著关联的位点。它找到的是“关联信号”：一个信号区域里往往有许多相互连锁的变异，GWAS 本身无法告诉你哪一个是真正的因果变异、又通过什么机制起作用。这部分需要变异效应预测来补充。
+n Trio（三人家系）设计 || 患者和父母一起测序。如果患者有某个变异而父母都没有，它就是新发（de novo）变异，这是罕见病诊断中非常有力的证据。
+n ExAC / gnomAD || 大规模人群测序汇总的变异频率数据库（gnomAD 是 ExAC 的后继者），用来判断一个变异在健康人群中是否罕见。
+n “synthesis（融合）”指什么 || 一方面，人们发现罕见病患者的多基因背景也会影响发病与严重程度；另一方面，常见病研究开始利用大规模测序数据中的罕见变异。两条路线因此汇合。
+
+=== 5 | 1 | World's biggest set of human genome sequences opens to scientists || 全球最大的人类基因组数据集开放
+h World's biggest set of human {{genome sequences|基因组序列}} opens to scientists || 全球最大的人类基因组序列数据集向科学家开放
+p The {{whole genomes|全基因组}} of 500,000 people in the UK Biobank will help researchers to {{probe|探查}} our {{genetic code|遗传密码}} for links to disease. || 英国生物样本库中 50 万人的全基因组数据，将帮助研究人员探查我们的遗传密码与疾病之间的联系。
+c More variants, better associations || 变异越多，关联发现就越多、越可靠
+n 背景 || 这是《Nature》的一则新闻标题（2023 年 11 月）：UK Biobank 向研究者开放了 50 万名参与者的全基因组测序（WGS）数据。
+n 为什么放在这里 || 全基因组测序不像 SNP 芯片或外显子组测序那样只看一部分位置，而是能看到每个人几乎所有的变异，包括大量罕见变异和非编码变异。数据越多，统计关联越有力；但随之而来的问题是：发现了海量变异，怎样判断每一个变异的作用？这就引出了“变异效应预测”。
+
+=== 6 | 1 | Rare disease diagnostics || 罕见病诊断流程
+h Rare disease {{diagnostics|诊断}} || 罕见病诊断
+li {{Variant tiering|变异分级}} at {{Genomics England|英格兰基因组公司（运营英国 NHS 基因组项目）}} || Genomics England 的变异分级流程
+l2 {{Panel gene test|基因面板检测}} || 基因面板检测
+l2 Focus on {{coding variants|编码区变异}} || 聚焦编码区变异
+p **Current {{diagnostics rate|诊断率}} of rare disease is below 50%, can we make this better?** || **目前罕见病的诊断率低于 50%，我们能做得更好吗？**
+fh 流程图
+f Start: {{Small variant|小变异}} ({{SNV|单核苷酸变异}} or {{indel|小片段插入/缺失}}) || 起点：一个小变异（SNV 或 indel）
+f ① Frequency, coding — Is the variant rare in the population, {{protein altering|改变蛋白质的}} in at least one {{transcript|转录本}} and {{segregating|（在家系中）共分离}} appropriately within the family (all modes tested)? → No: Not tiered (Tier null) || ① 频率、编码：该变异是否在人群中罕见、至少在一个转录本中改变蛋白质，并且在家系中符合相应的共分离规律（检验所有遗传模式）？→ 否：不分级（Tier null）
+f ② Gene panel — Is the variant in a Green gene in a {{PanelApp|PanelApp（英国基因面板知识库）}} panel applied to the {{participant|受检者}}? → No: Tier 3 || ② 基因面板：该变异是否位于为该受检者选用的 PanelApp 面板中的“绿色”基因里？→ 否：Tier 3（三级）
+f ③ {{Inheritance|遗传方式}} — Does the variant follow relevant {{mode of inheritance|遗传模式}} as specified in PanelApp? → No: Not tiered || ③ 遗传方式：该变异是否符合 PanelApp 中规定的相应遗传模式？→ 否：不分级
+f ④ {{LoF|功能丧失（loss of function）}} / {{de novo|新发的}} — Is the most severe predicted {{consequence|后果}} a loss of protein function and/or is the variant predicted to be de novo? → No: Tier 2 · Yes: Tier 1 || ④ 功能丧失 / 新发：预测的最严重后果是否为蛋白功能丧失，和/或该变异是否被判定为新发？→ 否：Tier 2（二级）· 是：Tier 1（一级）
+c [[genomicsengland.co.uk/blog/automated-variant-interpretation|https://www.genomicsengland.co.uk/blog/automated-variant-interpretation]] || 来源：Genomics England 博客《自动化变异解读》
+n 三个等级分别意味着什么 || Tier 1：位于相关疾病面板的“绿色”基因、符合遗传模式，并且是功能丧失（LoF）或新发变异，最可能致病，优先交给人工审核。Tier 2：同样在绿色基因中、符合遗传模式，但不是 LoF 或新发（例如大多数错义变异）。Tier 3：罕见且改变蛋白，但不在面板的绿色基因里。连第一关都过不了的变异不分级。
+n “Green gene”是什么 || PanelApp 里，专家按证据强度给每个疾病面板中的基因标红、琥珀、绿三色。绿色表示该基因与该疾病的关联证据充分，可以用于诊断。
+n “segregating appropriately” || 变异在家系中的分布要与疾病一致：患病的人携带，未患病的人按照对应的遗传模式（显性、隐性、X 连锁等）不携带，或只是杂合携带者。
+n 为什么诊断率低于 50% || 这套流程只看编码区、只看已知面板基因，而且只有 LoF 或新发变异能进入最高级。于是大多数错义变异只能停在 Tier 2（多为 VUS），非编码变异几乎全被筛掉。这两个缺口正是后面 AlphaMissense（错义变异）和 AlphaGenome（非编码变异）要补上的。
+
+=== 7 | 2 | AlphaMissense || AlphaMissense 概览
+h AlphaMissense || AlphaMissense（面向错义变异的模型）
+li What is the task (and why?)? || 任务是什么？（为什么要做？）
+li What did we build? || 我们构建了什么？
+li How do we know it does well at this task? || 我们怎么知道它在这个任务上做得好？
+li Why does it do well? || 它为什么做得好？
+li What is the output useful for? || 它的输出有什么用？
+fh 左侧总览图
+f Input — Reference: CAG → MDVVAMVN**Q**TVATMIS · {{Missense variant|错义变异}}: CGG → MDVVAMVN**R**TVATMIS || 输入——参考序列：密码子 CAG 编码谷氨酰胺（Q）；错义变异：密码子变为 CGG，编码精氨酸（R）
+f AlphaMissense: ① {{Structure context|结构上下文}} ② {{Protein language modeling|蛋白质语言建模}} ③ {{Training variants|训练用变异}} (Benign / Pathogenic) || AlphaMissense 的三个信息来源：① 结构上下文 ② 蛋白质语言建模 ③ 训练用变异（良性 / 致病）
+f Output — AlphaMissense pathogenicity: 0 = {{Benign|良性}} · {{Uncertain|不确定}} · 1 = {{Pathogenic|致病}} || 输出——AlphaMissense 致病性分数：0 = 良性 · 中间 = 不确定 · 1 = 致病
+f For all 71M possible missense variants in the {{human proteome|人类蛋白质组}}: 32% likely pathogenic · 57% likely benign · 11% uncertain || 对人类蛋白质组中全部 7100 万个可能的错义变异：32% 可能致病 · 57% 可能良性 · 11% 不确定
+c Jun Cheng, Guido Novati, … Pushmeet Kohli, Žiga Avsec; %%Science%%, Sept. 2023 || 作者列表；发表于《Science》，2023 年 9 月
+n 第 7–16 页的阅读线索 || 右侧五个问题就是 AlphaMissense 部分的提纲：任务与动机（第 8–9 页）→ 模型构建（第 10–11 页）→ 性能评估（第 12–15 页）→ 为什么好（结构信息加进化信息）→ 应用（第 13、16 页）。
+n 什么是错义变异 || 单个碱基改变使密码子编码的氨基酸发生改变（图中 CAG→CGG，谷氨酰胺 Q → 精氨酸 R）。对比：同义变异（氨基酸不变）；无义变异（变成终止密码子，蛋白提前截断）。
+n 三个信息来源分别是什么 || ① 结构上下文：来自 AlphaFold 对蛋白三维结构的理解，例如突变发生在蛋白内部核心还是表面、是否靠近结合界面；② 蛋白质语言建模：从大量物种的同源序列中学习“这个位置允许出现哪些氨基酸”，本质上是进化保守性；③ 训练用变异：用人类和灵长类群体中观察到的变异作为弱标签（详见第 11 页）。
+n 0–1 分数与三个类别 || 模型输出 0（良性）到 1（致病）之间的连续分数，再用两个阈值划为“可能良性 / 不确定 / 可能致病”（论文中约为 0.34 和 0.564，即第 13 页图里的两条虚线）。注意“likely（可能）”：这是模型预测，不等于临床诊断结论。
+
+=== 8 | 2 | Why? A major gap in our knowledge of variant effects || 为什么要做：认识上的巨大缺口
+h Why? A major {{gap|缺口}} in our knowledge of variant effects || 为什么？我们对变异效应的认识存在巨大缺口
+fh 饼图
+f ~0.1% Known {{pathogenic|致病的}} or {{benign|良性的}} ({{ClinVar|ClinVar 临床变异数据库}}) || 约 0.1%：已知是致病或良性（收录于 ClinVar）
+f ~5.5% seen in humans but {{unknown significance|意义未明}} || 约 5.5%：在人类中观察到过，但意义不明
+f {{Unobserved|未观察到的}} in humans (unknown significance) || 其余约 94%：从未在人类中观察到（当然也意义不明）
+n 这个饼图的“整体”是什么 || 是全部约 7100 万个可能的错义变异。只有约 0.1% 有明确的临床结论；约 5.5% 在测序人群中出现过，但不知道是好是坏；剩下的绝大多数还没在任何人身上被观察到。
+n 结论 || 靠实验或临床逐一验证这么多变异不现实，必须有计算模型对“所有可能的变异”预先打分。这就是 AlphaMissense 的动机。
+n ClinVar || 美国 NCBI 维护的公共数据库，收集各实验室提交的“变异—临床意义”判定（致病 / 可能致病 / 意义未明 / 可能良性 / 良性）。
+
+=== 9 | 2 | The task || 任务定义
+h The task || 任务
+fh 流程图
+f Input — Reference: CAG / MDVVAMVN**Q**TVATMIS · Missense variant: CGG / MDVVAMVN**R**TVATMIS (DNA / Protein) || 输入——参考：DNA 密码子 CAG，蛋白序列该位置为 Q；错义变异：DNA 变为 CGG，蛋白该位置变为 R
+f AlphaMissense (structure · language model · training variants) || AlphaMissense（结构 · 语言模型 · 训练用变异）
+f Output — AlphaMissense {{pathogenicity|致病性}}: 1 Pathogenic · Uncertain · 0 Benign || 输出——AlphaMissense 致病性：1 致病 · 不确定 · 0 良性
+f For all 71M possible missense variants in the human {{proteome|蛋白质组}}: 32% likely pathogenic · 11% · 57% likely benign || 对人类蛋白质组中全部 7100 万个可能的错义变异：32% 可能致病 · 11% 不确定 · 57% 可能良性
+n 任务的正式定义 || 输入：一条参考蛋白序列，加上某个位置上的一个氨基酸替换；输出：0–1 之间的致病性分数。也就是“给每一个可能的错义变异打分”。
+n 为什么是 7100 万 || 约 2 万个人类蛋白，每个位置理论上可以换成另外 19 种氨基酸，共约 2.16 亿种替换；但由于遗传密码的结构，只有其中一部分能由“单个碱基改变”产生，约 7100 万个。这些才是现实中会以 SNV 形式出现的错义变异。
+n 为什么可以“全部预先算好” || 蛋白质组是有限的。变异总数虽然大，但可以穷举：算一次、存起来，之后任何人查询都不需要再跑模型。
+
+=== 10 | 2 | AlphaFold Protein Structure Database || AlphaFold 蛋白质结构数据库
+h {{AlphaFold Protein Structure Database|AlphaFold 蛋白质结构数据库}} || AlphaFold 蛋白质结构数据库
+p Website developed and {{hosted|托管}} by {{EMBL-EBI|欧洲分子生物学实验室—欧洲生物信息研究所}} || 网站由 EMBL-EBI 开发并托管
+p Contains {{pre-run|预先运行好的}} predictions for **200M** protein structure predictions || 收录了约 **2 亿**个预先计算好的蛋白质结构预测
+fh 截图
+f AlphaFold Protein Structure Database — Developed by DeepMind and EMBL-EBI || AlphaFold 蛋白质结构数据库——由 DeepMind 与 EMBL-EBI 共同开发
+f 3D viewer — {{Model Confidence|模型置信度}}: Very high (pLDDT > 90) · Confident (90 > pLDDT > 70) · Low (70 > pLDDT > 50) · Very low (pLDDT < 50) || 3D 查看器——模型置信度：非常高（pLDDT > 90）· 较可信（70–90）· 低（50–70）· 非常低（< 50）
+f AlphaFold produces a {{per-residue|逐个残基的}} {{confidence score|置信度分数}} (pLDDT) between 0 and 100. Some regions below 50 pLDDT may be {{unstructured|没有固定结构的}} in {{isolation|单独存在时}}. || AlphaFold 会为每个残基给出 0–100 的置信度分数（pLDDT）。pLDDT 低于 50 的某些区域在单独存在时可能没有固定结构。
+n pLDDT || predicted Local Distance Difference Test，AlphaFold 对每个氨基酸位置“局部结构预测有多可靠”的自我评估。低于 50 的区域往往是天然无序区（intrinsically disordered region）：它们本身不折叠成固定形状，或只在与其他分子结合时才成形。
+n 残基（residue） || 蛋白质链中的每个氨基酸单元称为一个残基（氨基酸脱水缩合后“剩下的部分”）。
+n 与 AlphaMissense 的关系 || AlphaMissense 是在 AlphaFold 的基础上微调得到的；它的预测结果也已集成到这个数据库中，可以直接在网页上查看（见第 16 页）。2 亿个结构几乎覆盖了 UniProt 中所有已知的蛋白序列。
+
+=== 11 | 2 | AlphaMissense: Fine-tuning AlphaFold to predict variant pathogenicity || 模型构建：微调 AlphaFold
+h AlphaMissense: {{Fine-tuning|微调}} AlphaFold to predict variant {{pathogenicity|致病性}} || AlphaMissense：通过微调 AlphaFold 来预测变异的致病性
+fh 流程图（从左到右）
+f {{Protein sequence|蛋白质序列}} + {{Multiple sequence alignments|多序列比对}} (Residues →, Sequences ↓) || 蛋白质序列 + 多序列比对（横向是残基位置，纵向是不同物种的同源序列）
+f → AlphaFold → {{Language modeling|语言建模}}, … || → AlphaFold → 语言建模任务，以及其他任务……
+f Fine-tune ⟺ {{Weak labels|弱标签}}: ‘Benign’: Variants present in human/{{primate|灵长类}} population · ‘Pathogenic’: Variants absent in human/primate population || 微调 ⟺ 弱标签：“良性”= 在人类/灵长类群体中出现过的变异；“致病”= 在人类/灵长类群体中没有出现过的变异
+f → Variant pathogenicity score s_{i}^{a} = log p_{i}^{ref} − log p_{i}^{a} || → 变异致病性分数 s_{i}^{a}（位置 i 换成氨基酸 a 的分数），等于参考氨基酸与替换氨基酸的对数概率之差
+n 多序列比对（MSA） || 把同一个蛋白在许多物种中的同源序列逐位对齐。如果某个位置在漫长的进化中几乎从未改变（高度保守），说明它很重要，这里的突变就更可能有害。
+n 微调（fine-tuning） || 不从零开始训练，而是以已经训练好的 AlphaFold（它已经“懂得”蛋白结构）为起点，换上新的任务目标继续训练，让它学会判断致病性。
+n 为什么叫“弱”标签 || 训练时没有用 ClinVar 这类人工标注的临床标签（既避免偏倚，也让 ClinVar 可以作为公正的测试集），而是用一个近似规则：在人群中常见的变异能在自然选择下留存，所以“大概率良性”；从未出现过的变异则“偏向有害”。这个规则有很多例外（没见过不等于致病），所以叫“弱”标签，是带噪声的监督信号。灵长类（如黑猩猩）中常见的变异放到人身上通常也是良性的，因此可以用来扩充良性样本。
+n 公式怎么理解 || p_{i}^{a} 是模型认为位置 i 上应该是氨基酸 a 的概率，类似“完形填空”：遮住这个位置，让模型猜该填哪个氨基酸。s = log p(参考氨基酸) − log p(替换氨基酸)，即对数似然比。如果模型觉得原来的氨基酸非常“合理”、替换后的氨基酸很“不合理”，分数就高，变异更可能致病。最终分数还会经过校准，映射到 0–1。
+
+=== 12 | 2 | Most accurate predictions across a diverse set of benchmarks || 性能：多种基准测试
+h Most accurate predictions across a diverse set of {{benchmarks|基准测试}} || 在多种不同的基准测试中预测最准确
+fh 左图
+f ClinVar ({{Class-balanced|类别平衡的}} 18924 variants) · x-axis: {{auROC|ROC 曲线下面积}} · grey = Trained on ClinVar || ClinVar（致病、良性数量相等的 18,924 个变异）· 横轴：auROC · 灰色 = 该方法曾用 ClinVar 训练
+f AlphaMissense > VARITY_R_LOO > REVEL > EVE > gMVP > Eigen > CADD > Polyphen2_HVAR > ESM1b > SIFT > Polyphen2_HDIV > ESM1v > PrimateAI || 各方法按 auROC 从高到低排列，AlphaMissense 第一（约 0.94）
+fh 右图
+f {{Experimental assays|实验检测}} (25 proteins) · x-axis: mean {{Spearman correlation|斯皮尔曼相关系数}} || 实验检测数据（25 个蛋白）· 横轴：平均斯皮尔曼相关系数
+f AlphaMissense > ESM1v > Tranception > MSA_transformer > GEMME > EVE > gMVP > VARITY_R_LOO > REVEL > SIFT > Polyphen2_HVAR > Polyphen2_HDIV > CADD > PrimateAI || AlphaMissense 第一（约 0.5）
+n auROC || ROC 曲线下面积，衡量二分类（致病 vs 良性）的区分能力：0.5 等于随机猜，1 表示完美区分。
+n 灰色柱子的含义 || VARITY、REVEL、gMVP 本身用 ClinVar 数据训练，在 ClinVar 上测试相当于“考过原题”（循环性偏倚）。AlphaMissense 没有用 ClinVar 训练，却依然排第一，说服力更强。
+n “类别平衡”为什么重要 || 致病和良性样本数量相同，防止模型只靠“猜多数类”就拿到高分。
+n 右图在测什么 || 用深度突变扫描（DMS / MAVE）等实验，对一个蛋白的成千上万种突变逐一测量功能影响，再看预测分数与实验结果的等级相关程度。它检验的是模型能否反映真实的生化功能，而不只是临床标签。
+n 对比方法速览 || SIFT、PolyPhen-2：经典的保守性和结构规则方法；CADD：综合多种注释的打分；REVEL：集成多个工具的“元预测器”；EVE：基于进化序列的无监督生成模型；ESM1b / ESM1v、Tranception、MSA Transformer：蛋白质语言模型；PrimateAI：用灵长类变异训练的深度网络。
+
+=== 13 | 2 | AlphaMissense predictions for clinically actionable genes || 应用：临床可干预基因
+h AlphaMissense predictions for {{clinically actionable|临床上可干预的}} genes || AlphaMissense 对临床可干预基因的预测
+li Best performance for the majority (77%) of genes that are clinically actionable ({{ACMG|美国医学遗传学与基因组学学会}}). Mean {{gene-level|基因水平的}} auROC = 0.95 || 在大多数（77%）临床可干预基因（ACMG 列表）上表现最好。基因水平的平均 auROC = 0.95
+li Example – DSP: Missense variants are known to cause {{cardiac abnormalities|心脏异常}} that can result in {{juvenile|青少年的}} {{sudden death|猝死}} ({{OMIM|在线人类孟德尔遗传数据库}}). Model can predict many more likely pathogenic mutations that could {{facilitate|帮助、促进}} diagnosis of a potentially {{fatal|致命的}} {{disorder|疾病}}. || 例子——DSP 基因：已知其错义变异会引起心脏异常，可导致青少年猝死（见 OMIM）。模型能预测出更多可能致病的突变，有助于诊断这种可能致命的疾病。
+fh 图
+f Bottom-left: auROC per gene (MYBPC3, MSH2, … RYR1, … ACVRL1, DSP, … TGFBR2) for AlphaMissense · EVE · ESM1b · ESM1v || 左下：每个基因的 auROC，比较 AlphaMissense（蓝）、EVE、ESM1b、ESM1v
+f Right: ACVRL1/P37023 (auROC = 0.965) · RYR1/P21817 (auROC = 0.954) · DSP/P15924 (auROC = 0.97) · y: AM Pathogenicity · x: Position · {{transmembrane domain|跨膜结构域}} || 右：三个蛋白（基因名/UniProt 编号）的逐位置预测；纵轴：AM 致病性；横轴：氨基酸位置；结构图上标出了跨膜结构域
+n ACMG 可干预基因列表 || ACMG SF（secondary findings）列表：一组即使在检测中是“意外发现”，也建议告知患者的基因，因为它们导致的疾病有明确的预防或治疗手段（例如 BRCA1/2、LDLR、MYBPC3）。
+n 右侧三幅图怎么读 || 横轴是氨基酸位置，纵轴是 AM 致病性分数。淡色小点是该蛋白所有可能错义变异的预测值（红 = 高分，蓝 = 低分）；带黑边的大圆点是 ClinVar 中已知的致病（红）和良性（蓝）变异。已知致病变异大多落在高分区，说明预测与临床结论一致。两条虚线是“可能良性 / 可能致病”的阈值。右边的结构图把高分残基染成红色，可以看到致病性集中在特定结构域。
+n DSP || desmoplakin（桥粒斑蛋白），细胞间连接结构“桥粒”的组成部分。其突变可引起致心律失常性心肌病，严重时导致年轻人猝死。
+
+=== 14 | 2 | Is AlphaMissense informative of function? Example SHOC2 || 验证：能否反映蛋白功能（SHOC2）
+h Is AlphaMissense {{informative of|能提供……的信息}} function? Example SHOC2 || AlphaMissense 能反映蛋白功能吗？以 SHOC2 为例
+li AlphaMissense predictions {{correlate with|与……相关}} experimentally-measured impact of {{amino-acid substitutions|氨基酸替换}} on cancer cell {{fitness|适应度（生长存活能力）}}. || AlphaMissense 的预测与实验测得的“氨基酸替换对癌细胞适应度的影响”相关。
+li Regions with high AlphaMissense predictions reflect known {{functionally-significant|功能上重要的}} {{domains|结构域}}. || AlphaMissense 高分的区域与已知的功能重要结构域相吻合。
+fh 热图（三行）
+f Experiment (cancer cell fitness) — Observed ({{MAVE|多重化变异效应检测}}) · percentile MAVE score || 实验（癌细胞适应度）——实测 MAVE 分数（百分位）
+f AlphaMissense — Spearman R = 0.47 · EVE — Spearman R = 0.32 || AlphaMissense 与实验的斯皮尔曼相关为 0.47；EVE 为 0.32
+f Annotations: {{Leucine Rich Repeat|富亮氨酸重复}} domains · Residues: Core · Non-contact surface · PP1C interaction · MRAS interaction · y-axis: Alternate amino acid || 注释：富亮氨酸重复结构域；残基类别：核心 · 非接触表面 · PP1C 相互作用面 · MRAS 相互作用面；纵轴：替换成的氨基酸
+fh 结构图与箱线图
+f SHOC2–MRAS–PP1C (PDB: 7upi) · RVxF {{binding motif|结合基序}} · Leucine-rich repeats · Mean AF-Missense pathogenicity (0–1) || SHOC2–MRAS–PP1C 复合物结构（PDB 编号 7upi）· RVxF 结合基序 · 富亮氨酸重复 · 按平均致病性着色（0–1）
+f Median: Core Residue 0.99 · MRAS interact. 0.98 · PP1C interact. 0.96 · Non-Contact Surface Residue 0.51 || 中位数：核心残基 0.99 · MRAS 界面 0.98 · PP1C 界面 0.96 · 非接触表面残基 0.51
+n 热图怎么读 || 横轴是 SHOC2 的氨基酸位置（这里展示约 200 个位置），纵轴是可替换成的 20 种氨基酸，每一格的颜色表示该替换的效应（红 = 有害，蓝 = 无害）。上：实验实测；中：AlphaMissense 预测；下：EVE 预测（左侧灰色是 EVE 因序列比对覆盖不足而无法预测的区域）。三者的红蓝图案越相似，预测越好。
+n MAVE / 深度突变扫描 || Multiplexed Assays of Variant Effect：在细胞中一次性引入某个蛋白的成千上万种突变，通过测序读出每种突变对细胞（例如癌细胞增殖）的影响，得到“突变效应全景图”。
+n 0.47 算高吗 || 斯皮尔曼 R 是等级相关。0.47 明显高于 EVE 的 0.32，但并不完美：实验本身有噪声，而且“癌细胞适应度”只是蛋白功能的一个侧面。
+n 箱线图说明了什么 || 埋在蛋白内部的核心残基（0.99）和与伙伴蛋白结合的界面残基（0.98、0.96）预测致病性很高，而不与其他分子接触的表面残基中位数只有 0.51。说明模型“懂得”结构：在内部或结合界面上的位置不能随便突变。
+n SHOC2 是什么 || 它与 MRAS、PP1C 组成一个磷酸酶复合物，激活 RAS–MAPK 信号通路，与癌症和 Noonan 样综合征有关。
+
+=== 15 | 2 | Third-party assessments || 第三方评估
+h {{Third-party|第三方}} {{assessments|评估}} || 第三方评估
+li AM pathogenicity score correlated {{modestly|中等程度地}} with pathogenicity {{metrics|指标}} … || AM 致病性分数与（临床）致病性指标呈中等程度相关……
+li … the AM score correlated well with {{CFTR|囊性纤维化跨膜传导调节因子}} functional data {{in vitro|体外}} … || ……AM 分数与 CFTR 的体外功能数据相关性良好……
+li AlphaMissense’s {{consistent|一致的、稳定的}} capability in predicting pathogenicity across diverse protein groups, {{spanning|涵盖}} both {{transmembrane|跨膜的}} and {{soluble|可溶性的}} domains was found. || 研究发现，AlphaMissense 在多种蛋白类别中预测致病性的能力都很稳定，既包括跨膜结构域，也包括可溶性结构域。
+fh 论文与图
+f Benchmarking AlphaMissense Pathogenicity Predictions Against {{Cystic Fibrosis|囊性纤维化}} Variants (McDonald et al.) || 论文一：《以囊性纤维化变异为基准评测 AlphaMissense 的致病性预测》（McDonald 等）
+f Lightway access to AlphaMissense data that demonstrates a balanced performance of this missense mutation predictor (Tordai et al.) || 论文二：《便捷获取 AlphaMissense 数据，并显示该错义突变预测器表现均衡》（Tordai 等）
+f Scatter: CF Causing · Variable Consequences · Other · Unknown Significance · y: In vitro functional data, FSK (%WT) · x: AlphaMissense Score · r = −0.70, ρ = −0.69 || 散点图：囊性纤维化致病 · 后果不一 · 其他 · 意义未明；纵轴：体外功能数据（FSK 刺激下相对野生型的百分比）；横轴：AM 分数；相关系数 r = −0.70，ρ = −0.69
+f Histogram: CFTR2 – pathogenic · CFTR2 – benign · y: frequency · x: AlphaMissense score || 直方图：CFTR2 数据库中的致病变异（蓝）与良性变异（橙）；纵轴：频率；横轴：AM 分数
+n 为什么看第三方评估 || 开发者自己做的评估可能存在选择性偏倚；独立团队用自己的数据测试，结果更可信。
+n 散点图怎么读 || 每个点是一个 CFTR 错义变异。横轴是 AM 分数，纵轴是该突变 CFTR 通道在体外的功能（相对野生型的百分比）。r = −0.70 的负相关表示：AM 分数越高，通道功能越差，正符合“高分 = 破坏功能”。
+n FSK || forskolin（福斯可林），通过升高 cAMP 来激活 CFTR 通道，用于在体外测量通道功能。
+n “modestly”的提醒 || 与临床致病性指标（如疾病严重程度）只是中等相关。这提醒我们：预测分数有用，但不能直接替代临床判断。
+n 囊性纤维化与 CFTR || 囊性纤维化是常染色体隐性遗传病，由 CFTR 基因突变导致氯离子通道功能缺陷；CFTR2 是专门记录 CFTR 变异临床意义的数据库。
+
+=== 16 | 2 | Try it yourself using AlphaFold Database! || 动手：在 AlphaFold 数据库中查看
+h Try it yourself using AlphaFold Database! || 用 AlphaFold 数据库亲手试试！
+c [[https://alphafold.ebi.ac.uk/entry/Q9UQ13|https://alphafold.ebi.ac.uk/entry/Q9UQ13]] || 示例条目链接（Q9UQ13 是 SHOC2 的 UniProt 编号）
+fh 网页截图
+f Tabs: Model Confidence · AlphaMissense Pathogenicity · Likely benign · Uncertain · Likely pathogenic || 标签页：模型置信度 · AlphaMissense 致病性；图例：可能良性 · 不确定 · 可能致病
+f The displayed colour for each residue is the average AlphaMissense pathogenicity score across all possible amino acid substitutions at that position. || 每个残基显示的颜色，是该位置所有可能氨基酸替换的 AlphaMissense 致病性分数的平均值。
+f AlphaMissense Pathogenicity {{Heatmap|热图}} · Residue sequence number · Alternative amino acids · Filter by category || AlphaMissense 致病性热图 · 残基序号 · 替换氨基酸 · 按类别筛选
+f {{Predicted aligned error|预测对齐误差}} (PAE): Click and drag a box on the PAE viewer to select regions of the structure and highlight them on the 3D viewer. PAE data is useful for assessing {{inter-domain|结构域之间的}} accuracy. || 预测对齐误差（PAE）：在 PAE 图上拖拽框选，可选中结构中对应的区域并在 3D 视图中高亮。PAE 数据可用于评估结构域之间相对位置的准确性。
+f Tooltip: Score: 0.902 · Variant: F65G || 悬停提示：分数 0.902 · 变异 F65G
+n 操作步骤 || 打开链接 → 切换到 “AlphaMissense Pathogenicity” 标签，三维结构会按平均致病性着色 → 在下方热图上移动鼠标，可以看到每个具体替换的分数。
+n 变异写法 F65G || 参考氨基酸（F，苯丙氨酸）+ 位置（第 65 位）+ 替换后的氨基酸（G，甘氨酸），用单字母代码。0.902 高于 0.564 的阈值，属于“可能致病”。
+n PAE || 预测对齐误差：表示“以残基 x 为参照时，残基 y 的位置误差有多大”（单位 Å）。它用来判断不同结构域之间的相对摆放是否可信；pLDDT 只反映局部结构的可信度。
+
+=== 17 | 3 | AI for deciphering how DNA works || 用 AI 破译 DNA 的工作方式
+h AI for {{deciphering|破译}} how DNA works || 用 AI 破译 DNA 是如何工作的
+li Understanding the molecular function of {{genomic sequences|基因组序列}} is an {{open problem|尚未解决的问题}} in human genetics. || 理解基因组序列的分子功能，是人类遗传学中一个尚未解决的问题。
+li Over 98% of observed genetic variation in humans is in **{{non-coding|非编码的}}** regions || 在人类中观察到的遗传变异，有超过 98% 位于**非编码**区
+l2 Many non-coding variants are {{involved in|与……有关}} disease || 许多非编码变异与疾病有关
+l2 Many possible {{mechanisms|机制}} || 可能的作用机制很多
+l2 {{Characterization|功能鉴定}} {{intractable|难以完成的}} without computational predictions || 没有计算预测，几乎不可能对它们逐一做功能鉴定
+li **{{Sequence-to-function|序列到功能}} AI models** take a DNA sequence as input and predict the output of {{genomic assays|基因组学实验检测}}. || **“序列到功能”AI 模型**以 DNA 序列为输入，预测基因组学实验的检测结果。
+li Good models should also {{generalise|泛化}} to {{perturbations|扰动（改动）}} of the sequence i.e. “variant effect prediction”. || 好的模型还应该能泛化到对序列的改动上，也就是“变异效应预测”。
+fh 示意图
+f DNA · {{Cell nucleus|细胞核}} · {{TADs|拓扑关联结构域}} · {{Promoter|启动子}} · 5′UTR · TF1 / TF2 · {{Enhancer|增强子}} · {{Silencer|沉默子}} · {{Transposable element|转座元件}} · {{Intron|内含子}} · {{Exon|外显子}} · 3′UTR · {{Tandem repeats|串联重复}} · {{lncRNA|长链非编码 RNA}} || DNA · 细胞核 · 拓扑关联结构域 · 启动子 · 5′ 非翻译区 · 转录因子 1/2 · 增强子 · 沉默子 · 转座元件 · 内含子 · 外显子 · 3′ 非翻译区 · 串联重复 · 长链非编码 RNA
+f Input: 1 Mb DNA sequence → RNA-seq || 输入：1 Mb DNA 序列 → 输出：RNA-seq 信号
+n 为什么非编码区难 || 编码区变异可以用“遗传密码表”直接推出氨基酸变化；非编码区没有这样的密码表。非编码变异可能通过改变转录因子结合、增强子活性、RNA 剪接、染色质结构等多种途径影响基因表达，而被影响的基因可能在几十万碱基之外。
+n 图意 || 左边一大串 ACGT 是基因组序列，手指指着其中一个碱基（一个变异）；中间是细胞核，DNA 在其中缠绕成染色质；右边示意各种调控元件：启动子、增强子、沉默子、转座元件、串联重复、lncRNA，以及 TAD（染色质三维结构中内部相互接触频繁的“区块”）。
+n “序列到功能”和“泛化到扰动” || 把问题当作监督学习：输入 DNA 序列，输出这段序列上的各种实验信号（如 RNA-seq 覆盖度）。训练好以后，把序列中的某个碱基改掉再预测一次，两次预测之差就是这个变异的效应。模型从没见过这条突变序列，却要预测得准，这就是“泛化到扰动”。
+
+=== 18 | 3 | Advances of AlphaGenome || AlphaGenome 的三大突破
+h Advances of AlphaGenome || AlphaGenome 的突破
+li **Long input length** — Takes 1 {{megabase|兆碱基（百万碱基）}} (Mb) of DNA sequence as input || **输入长**——以 1 Mb（100 万个碱基）的 DNA 序列作为输入
+li **High-resolution** — Predicts thousands of functional genomic {{tracks|信号轨道}} up to single {{base-pair|碱基对}} resolution || **分辨率高**——预测数千条功能基因组信号轨道，最高可达单碱基分辨率
+li **Models diverse modalities** — {{Gene expression|基因表达}}, {{Splicing|剪接}}, {{Accessibility|（染色质）可及性}}, {{Transcription factor binding|转录因子结合}}, {{Histone modifications|组蛋白修饰}}, {{chromatin contact maps|染色质接触图}} || **覆盖多种模态**——基因表达、剪接、染色质可及性、转录因子结合、组蛋白修饰、染色质接触图
+fh 示意图
+f Input: 1 million base DNA sequence → AlphaGenome → Output || 输入：100 万碱基的 DNA 序列 → AlphaGenome → 输出
+f Modalities: Gene expression · Accessibility · Histone modifications · TF binding · Splicing · Chromatin contact maps || 模态：基因表达 · 可及性 · 组蛋白修饰 · 转录因子结合 · 剪接 · 染色质接触图
+f Thousands of predictions of molecular properties across different cell types || 跨越不同细胞类型的数千种分子特性预测
+n Track（轨道）是什么 || 沿基因组坐标排列的一条信号曲线，例如“肝脏组织 RNA-seq 在每个碱基位置的读段覆盖度”。在基因组浏览器里，一行就是一条 track。
+n 各模态分别测什么 || 基因表达（RNA-seq、CAGE）：转录出多少 RNA；可及性（DNase-seq、ATAC-seq）：染色质是否“打开”、能否被蛋白结合；组蛋白修饰（ChIP-seq，如 H3K27ac 标记活跃增强子）；转录因子结合（ChIP-seq）：转录因子结合在哪里；剪接：剪接位点和外显子之间如何连接；接触图（Hi-C / Micro-C）：哪些 DNA 片段在三维空间中彼此靠近，例如增强子与启动子。
+n 为什么 1 Mb 很重要 || 增强子可能距离它调控的基因几十万碱基。如果模型只看几千碱基的窗口，就看不到这类远端调控。
+
+=== 19 | 3 | How was AlphaGenome trained? || 训练数据与模型结构
+h How was AlphaGenome trained? || AlphaGenome 是怎样训练的？
+p **Training data** || **训练数据**
+li Hundreds of genomic assays (‘tracks’), for human and mouse, {{sourced from|来源于}} {{ENCODE|DNA 元件百科全书计划}}, {{GTEx|基因型-组织表达项目}} + others. || 数百种基因组学实验（“轨道”），涵盖人和小鼠，数据来自 ENCODE、GTEx 等项目。
+fh 模型结构图
+f Input: 1 Mb DNA sequence → {{Sequence partitioning|序列分块}} → {{Interconnected devices|互联的计算设备}}: {{Encoders|编码器}} → {{Transformers|Transformer 模块}} → {{Decoders|解码器}} → Output types || 输入 1 Mb DNA → 序列分块 → 分配到多台互联设备上：编码器 → Transformer → 解码器 → 各类输出
+f Output types (Human / Mouse / {{Resolution|分辨率}}): RNA-seq 667 / 173 / 1 bp · CAGE 546 / 188 / 1 bp · PRO-cap 12 / 0 / 1 bp · DNase 305 / 67 / 1 bp · ATAC 167 / 18 / 1 bp || 输出类型（人 / 小鼠轨道数 / 分辨率）：RNA-seq 667/173/1 bp · CAGE 546/188/1 bp · PRO-cap 12/0/1 bp · DNase 305/67/1 bp · ATAC 167/18/1 bp
+f Histone mods 1116 / 183 / 128 bp · TF binding 1617 / 127 / 128 bp · Splice sites 4 / 4 / 1 bp · Splice junctions 734 / 180 / 1 bp · Splice site usage 734 / 180 / 1 bp · DNA contact maps 28 / 8 / 2048 bp · Total 5930 / 1128 || 组蛋白修饰 1116/183/128 bp · 转录因子结合 1617/127/128 bp · 剪接位点 4/4/1 bp · 剪接连接 734/180/1 bp · 剪接位点使用率 734/180/1 bp · DNA 接触图 28/8/2048 bp · 合计：人 5930 条、小鼠 1128 条
+n 模型结构 || 1 Mb 的序列太长，一台设备放不下，于是切成若干块，分到多台互联的加速器上并行计算。每块先经卷积“编码器”逐步压缩，再由 Transformer 在块与块之间交换信息（捕捉长距离的相互作用），最后由“解码器”逐步恢复到高分辨率输出。这种“先压缩、再还原”的形状类似 U-Net。
+n 分辨率这一列 || 说明不同输出的精细程度：大多数是单碱基（1 bp）；组蛋白修饰和转录因子结合的信号本身比较“宽”，以 128 bp 为单位；接触图以 2048 bp 为一格。
+n 几种检测技术 || CAGE、PRO-cap：测转录起始位点；DNase-seq、ATAC-seq：测染色质可及性；ChIP-seq：测组蛋白修饰或转录因子结合；Splice sites / junctions / usage：分别是剪接位点、外显子之间的连接、某个剪接位点被使用的比例。这正好是第 2 页说的 11 种模态。
+n 为什么也用小鼠数据 || 额外的物种提供更多训练信号；许多调控“语法”在人和小鼠之间是保守的，可以互相借鉴。
+n ENCODE 与 GTEx || ENCODE：系统绘制人类和小鼠基因组功能元件的大型计划；GTEx：在数百名捐献者的几十种组织中测量基因型和基因表达，用于研究遗传变异如何影响表达。（幻灯片中写作 “GTex”。）
+
+=== 20 | 3 | How was AlphaGenome trained? || 两阶段训练：预训练与蒸馏
+h How was AlphaGenome trained? || AlphaGenome 是怎样训练的？
+p **Two phases of training** || **两个训练阶段**
+li %%{{Pre-training|预训练}}:%% || %%预训练：%%
+l2 Train using observed experimental data and evaluate on {{held-out|留出的（不参与训练的）}} genomic regions || 用实测的实验数据训练，并在留出的基因组区域上评估
+li %%{{Distillation|（知识）蒸馏}}:%% || %%蒸馏：%%
+l2 Use whole genome, but train on %%predicted tracks%% using {{randomly-perturbed|随机扰动过的}} sequences as input. || 使用全基因组，但以随机扰动过的序列为输入，以（教师模型）%%预测出的轨道%%为训练目标。
+fh 图 b：预训练流程
+f Sample 1 Mb intervals → {{Random shift|随机平移}} → 50% {{reverse complement|反向互补}} → Observed vs. Predicted → {{Loss|损失}} || 采样 1 Mb 区间 → 随机平移 → 50% 概率取反向互补 → 比较实测与预测 → 计算损失
+fh 图 c：蒸馏流程
+f Sample 1 Mb intervals → Random shift → 50% reverse complement → {{Random mutations|随机突变}} → Teachers: Predicted target · Student: Predicted → Loss || 采样 → 随机平移 → 反向互补 → 加入随机突变 → 教师模型给出“预测目标”，学生模型做出预测 → 两者比较计算损失
+n 数据增强：随机平移与反向互补 || 随机平移让模型不依赖序列在窗口中的绝对位置；DNA 是双链，反向互补序列代表同一段 DNA 的另一条链，随机取反向互补能让模型对两条链一视同仁。
+n 为什么要“留出区域” || 好比考试不能考原题：把部分基因组区域划为测试集、不参与训练，用来检验模型对没见过的序列预测得准不准。
+n 蒸馏在做什么 || 先训练多个“教师”模型（一个模型集成），再训练一个“学生”模型去模仿教师们的预测。好处有三：① 学生可以在整个基因组上训练，不必再留出区域；② 输入中加入随机突变，教师会给出“突变后应该是什么样”的预测，学生由此更好地学会预测变异效应；③ 一个学生模型就能接近整个集成的效果，推理更快（第 24 页：单个 GPU 不到 1 秒）。
+n Loss（损失） || 衡量预测与目标之间差距的数值。训练就是不断调整模型参数，让损失变小。
+
+=== 21 | 3 | Genome track predictions || 轨道预测示例
+h Genome track predictions || 基因组轨道预测
+li Accurately predicts experimental {{readouts|读出结果}} on previously {{unseen|未见过的}} genomic {{intervals|区间}} || 能准确预测此前未见过的基因组区间上的实验读出结果
+li {{Explicit|显式的}} prediction of {{splice sites|剪接位点}} and {{junction usage|剪接连接使用情况}} || 能显式预测剪接位点和剪接连接的使用情况
+fh 图 a：AlphaGenome 轨道预测示例
+f Transcripts (GENCODE v46) · RNA-seq (+) / (−) · ATAC · DNase · H3K27ac · CTCF · Contact maps — each with Obs / Pred || 转录本注释（GENCODE v46）· 正链/负链 RNA-seq · ATAC · DNase · H3K27ac · CTCF · 接触图——每项都有“实测 / 预测”两行
+f chr19:10587331-11635907 (1 Mb) · Cell line: HepG2 · Position on chromosome 19 || 19 号染色体上一段 1 Mb 区间 · 细胞系：HepG2 · 横轴为 19 号染色体坐标
+fh 图 b：剪接预测示例
+f Transcript: LDLR · Pred {{splice donor|剪接供体}} (+) · Pred {{splice acceptor|剪接受体}} (+) · Splice site Usage (+) Obs / Pred · Pred splice junctions · RNA-seq (+) Obs / Pred || 转录本：LDLR · 预测的剪接供体位点（正链）· 预测的剪接受体位点 · 剪接位点使用率（实测/预测）· 预测的剪接连接 · RNA-seq（实测/预测）
+f chr19:11086619-11136619 (50 kb) · Cell line: HepG2 || 19 号染色体上一段 50 kb 区间 · 细胞系：HepG2
+n 怎么判断“预测得准” || 每种信号都有 Obs（observed，实测）和 Pred（predicted，预测）两行，两行的形状几乎一样，说明模型在没见过的区间上也能重现实验结果。
+n 几个标记 || (+)/(−)：从 DNA 正链/负链转录的 RNA；H3K27ac：组蛋白 H3 第 27 位赖氨酸乙酰化，标记活跃的增强子和启动子；CTCF：一种“绝缘子”蛋白，参与形成染色质环和 TAD 边界。
+n 接触图怎么看 || 关于对角线对称的热图：右上三角是实测（Obs），左下三角是预测（Pred）。颜色越深，表示这两个位置在三维空间中接触越频繁。
+n 剪接基础 || 前体 mRNA 要切掉内含子、把外显子连起来。剪接供体（donor）位于内含子 5′ 端（通常以 GT 开头），剪接受体（acceptor）位于内含子 3′ 端（通常以 AG 结尾）。图 b 中的弧线表示“哪个外显子连到哪个外显子”（junction），弧上的数字表示连接的使用强度。
+n HepG2 与 LDLR || HepG2：人肝癌细胞系，ENCODE 的常用细胞系之一。LDLR：低密度脂蛋白受体基因，突变导致家族性高胆固醇血症。
+
+=== 22 | 3 | Variant effect predictions || 变异效应预测（一）：基因表达
+h Variant effect predictions || 变异效应预测
+p To predict the effect of a variant, we can use the model to predict outputs for two 1Mb DNA sequences: one containing a **{{reference|参考}}** {{allele|等位基因}} and the other containing an **{{alternative|替代（变异）}}** allele. || 要预测一个变异的效应，可以让模型分别对两条 1 Mb 的 DNA 序列做预测：一条含有**参考**等位基因，另一条含有**替代**（变异）等位基因。
+fh 1) Gene expression example
+f 1) Gene expression example — APOL4 · `chr22:36201698:A>C` · #Hom REF: 20 · #Hom ALT: 2 || 1) 基因表达示例——APOL4 基因 · 变异 chr22:36201698:A>C · 纯合参考型 20 人 · 纯合变异型 2 人
+f Observed / Predicted tracks, REF (blue) vs ALT (red) · chr22:36184123-36209840 (25 kb) · Tissue: Colon (Sigmoid) || 实测 / 预测两组轨道，蓝 = 参考，红 = 变异 · 区间 25 kb · 组织：乙状结肠
+f Variant predicted to decrease expression || 预测该变异会降低基因表达
+n 核心方法：REF 和 ALT 各预测一次 || 两条序列只差一个碱基，其余完全相同。分别预测后比较两组输出，差异就是这个变异的效应。这种做法叫“计算机模拟突变”（in silico mutagenesis）。
+n 变异写法 chr22:36201698:A>C || 22 号染色体第 36,201,698 位，参考碱基 A 变为 C（GRCh38 坐标）。
+n 图怎么读 || 上面一组是 GTEx 真实人群的实测数据：蓝线是 20 个纯合参考型个体的平均表达，红线是 2 个纯合变异型个体，红线明显更低。下面一组是模型预测，同样是红线低于蓝线。也就是说，模型只看 DNA 序列，就重现了“携带这个变异的人 APOL4 表达更低”这一真实观察。
+n 等位基因（allele） || 同一位置上的不同版本。参考等位基因 = 参考基因组上的碱基；替代等位基因 = 变异后的碱基。Hom = homozygous（纯合），Het = heterozygous（杂合）。
+
+=== 23 | 3 | Variant effect predictions || 变异效应预测（二）：剪接
+h Variant effect predictions || 变异效应预测
+p To predict the effect of a variant, we can use the model to predict outputs for two 1Mb DNA sequences: one containing a **reference** allele and the other containing an **alternative** allele. || （与上页相同）要预测一个变异的效应，可以让模型分别对含**参考**等位基因和含**替代**等位基因的两条 1 Mb 序列做预测。
+f 1) Gene expression example — Variant predicted to decrease expression || 1) 基因表达示例（同上页）——预测该变异会降低表达
+fh 2) Splicing example（本页新增）
+f 2) Splicing example — Tissue: Artery (tibial) · DLG1 · `chr3:197081044:TACTC>T` || 2) 剪接示例——组织：胫动脉 · DLG1 基因 · 变异 chr3:197081044:TACTC>T
+f Splice junctions (REF: 0.54, 1.02 · ALT: 0.32) · Splice sites / splice sites usage · RNA-seq (predicted) · RNA-seq (observed) · #Hom REF: 20 · #Het ALT: 1 · chr3:197076044-197086544 (10.5 kb) || 剪接连接（参考：0.54、1.02；变异：0.32）· 剪接位点 / 使用率 · RNA-seq（预测）· RNA-seq（实测）· 纯合参考型 20 人 · 杂合变异携带者 1 人 · 区间 10.5 kb
+f Variant predicted to cause {{exon skipping|外显子跳跃}} || 预测该变异会导致外显子跳跃
+n TACTC>T 是什么变异 || 参考序列是 TACTC，变异后只剩 T，也就是缺失了 ACTC 四个碱基。这是一个小片段缺失（indel），不是单碱基替换，AlphaGenome 同样能处理。
+n 剪接示例怎么读 || 蓝色弧线（REF）是正常的连接：左边外显子 → 中间外显子（0.54）→ 右边外显子（1.02）。红色弧线（ALT）出现了一条从左边外显子直接跨到右边外显子的长连接（0.32），也就是中间那个外显子被“跳过”了。缺失恰好落在中间外显子的剪接位点附近（黄色倒三角处），破坏了剪接信号。
+n 外显子跳跃的后果 || 成熟 mRNA 少了一个外显子，翻译出的蛋白会缺失一段；如果该外显子长度不是 3 的倍数，还会造成移码。
+
+=== 24 | 3 | Variant effect predictions || 变异效应预测（三）：打分方法
+h Variant effect predictions || 变异效应预测
+li We designed recommended {{scoring strategies|打分策略}} per output type of the model. || 我们为模型的每一种输出类型都设计了推荐的打分策略。
+li For most output types we predict **a single score per variant** for each track ({{tissue|组织}}/{{cell-type|细胞类型}}). || 对大多数输出类型，我们在每条轨道（每个组织/细胞类型）上为每个变异给出**一个分数**。
+li For some output types (e.g. RNA_SEQ) we generate a variant score for **every gene {{proximal|邻近的}} to the variant**. || 对某些输出类型（如 RNA_SEQ），我们为**变异附近的每一个基因**分别生成一个变异分数。
+c Recommended guide to variant scoring: [[alphagenomedocs.com/variant_scoring.html|https://www.alphagenomedocs.com/variant_scoring.html]] || 变异打分的推荐指南（官方文档）
+fh 打分示意图
+f RNA-seq variant scoring: Variant · Gene · {{Exon mask|外显子掩码}} → MEAN → LOG(x+1e−3): REF 1.8 → 0.6 · ALT 1.5 → 0.4 → ALT − REF = −0.2 || RNA-seq 变异打分：在该基因外显子区域（外显子掩码）内取平均 → 取对数 log(x+0.001)：参考 1.8 → 0.6；变异 1.5 → 0.4 → 变异减参考 = −0.2
+f Accessibility variant scoring: Variant · {{Center mask|中心掩码}} → SUM → LOG2(x+1): REF 0.4 → 0.5 · ALT 1.3 → 1.2 → ALT − REF = 0.7 || 可及性变异打分：在以变异为中心的窗口（中心掩码）内求和 → 取 log2(x+1)：参考 0.4 → 0.5；变异 1.3 → 1.2 → 变异减参考 = 0.7
+f Inputs: REF · ALT · Masks → Predict variant (Predict REF and ALT) → {{Masking|掩码}}/{{alignment|对齐}} → Generate scores for all modalities → Score variant || 输入：参考序列 · 变异序列 · 掩码 → 预测 REF 与 ALT → 掩码 / 对齐 → 为所有模态生成分数 → 变异打分
+f Scores: RNA-seq · CAGE · ATAC · DNase · ChIP-Histone · ChIP-TF · Splice site usage · Splice junctions · Contact maps … (red boxes = {{Gene-specific|基因特异的}} scores) · Single GPU device, < 1 second || 分数：RNA-seq · CAGE · ATAC · DNase · 组蛋白 ChIP · 转录因子 ChIP · 剪接位点使用率 · 剪接连接 · 接触图……（红框 = 按基因分别计算的分数）· 单个 GPU，耗时不到 1 秒
+n 以 RNA-seq 为例 || 先在该基因的外显子位置上，对预测的覆盖度取平均（REF 1.8，ALT 1.5），再取对数（这里是自然对数：ln 1.8 ≈ 0.6，ln 1.5 ≈ 0.4），最后 ALT − REF = −0.2：变异使该基因在这个组织中的预测表达下降。
+n 可及性的计算 || 在以变异为中心的一段窗口内把信号加起来（REF 0.4，ALT 1.3），取 log2(x+1)（得 0.5 和 1.2），相减得 0.7：变异使附近的染色质变得更“开放”。
+n 为什么要取对数 || 表达量等信号可以相差好几个数量级。取对数后两者之差约等于“倍数变化”（log fold change），不同基因、不同组织之间才有可比性。加 0.001 或加 1 是为了避免对 0 取对数。
+n 什么是 mask（掩码） || 一个“只看这些位置”的筛选窗口：外显子掩码只取该基因外显子上的信号，中心掩码只取变异附近的信号。
+n 为什么有“基因特异分数” || 一个变异附近可能有好几个基因，它可能影响其中一个而不影响另一个，所以 RNA-seq 和剪接类分数要按基因分别计算（图中红框）。
+
+=== 25 | 3 | Variant effect predictions performance || 变异效应预测的性能
+h Variant effect predictions performance || 变异效应预测的性能
+li For **variant effect prediction**, we matched or {{outperformed|超过}} external models on 24 out of 26 evaluations. || 在**变异效应预测**上，我们在 26 项评估中有 24 项达到或超过了外部模型。
+li Outperform both {{specialised models|专用模型}} and other {{multitask models|多任务模型}}. || 既优于针对单一任务的专用模型，也优于其他多任务模型。
+fh 图：Variant effect prediction: Distilled model, all-folds
+f Columns: {{Modality|模态}} · Evaluation · Type · Comparison · AlphaGenome {{relative improvement|相对提升}} (%) || 列：模态 · 评估任务 · 类型 · 对比模型 · AlphaGenome 相对提升（%）
+f Splicing: ClinVar splice site region (Causality) vs Pangolin 3.7 · ClinVar noncoding vs Pangolin 2.9 · ClinVar missense vs DeltaSplice 13.7 · GTEx splicing outlier (zero-shot) vs Pangolin 59.1 · GTEx splicing outlier (supervised) vs AbSplice 13.0 · sQTL (Causality) vs Pangolin 13.9 · MFASS vs Pangolin −5.7 || 剪接：ClinVar 剪接区域 +3.7 · ClinVar 非编码 +2.9 · ClinVar 错义 +13.7 · GTEx 剪接离群（零样本）+59.1 · GTEx 剪接离群（有监督）+13.0 · sQTL（因果）+13.9 · MFASS −5.7
+f RNA expression: eQTL (Direction) vs Borzoi 25.5 · eQTL (zero-shot, Causality) −1.1 · eQTL (supervised, Causality) 15.0 · ENCODE E2G (zero-shot) 13.0 · paQTL 8.8 || RNA 表达：eQTL（方向）+25.5 · eQTL（零样本，因果）−1.1 · eQTL（有监督，因果）+15.0 · ENCODE E2G（零样本）+13.0 · paQTL +8.8
+f DNA accessibility: CAGI5 MPRA (Causality) vs Borzoi 6.3 · ds/caQTL (Direction) vs ChromBPNet 8.0 · ds/caQTL (Causality) vs Borzoi 18.0 · TF binding: bQTL (Direction) 2.8 · bQTL (Causality) 6.0 || DNA 可及性：CAGI5 MPRA +6.3 · ds/caQTL（方向）+8.0 · ds/caQTL（因果）+18.0 · 转录因子结合：bQTL（方向）+2.8 · bQTL（因果）+6.0
+n QTL 家族 || QTL = 数量性状位点。eQTL：与基因表达量相关的变异；sQTL：与剪接相关；paQTL：与多聚腺苷酸化位点的选择相关；caQTL / dsQTL：与染色质可及性（DNase 敏感性）相关；bQTL：与转录因子结合相关。它们来自真实人群数据，是检验“变异是否真的改变分子表型”的重要标准。
+n Direction 与 Causality || Direction：预测的效应方向（升高还是降低）对不对；Causality：能不能把真正的因果变异，与附近那些因连锁而“沾光”的非因果变异区分开。
+n Zero-shot 与 supervised || 零样本：直接使用模型输出的分数，不针对该任务额外训练；有监督：把模型分数当作特征，再训练一个小分类器。
+n 没赢的两项 || 柱子长度是相对于最强对手的提升百分比。负值（MFASS −5.7%，eQTL 零样本因果 −1.1%）就是 26 项中没超过的那 2 项。
+n 其他名词 || MPRA：大规模平行报告基因实验，一次测量成千上万条序列的调控活性；CAGI5：第五届变异效应预测公开挑战赛；ENCODE E2G：增强子与靶基因连接的基准；MFASS：大规模测量外显子剪接变异效应的实验数据集。对比模型中，Pangolin、DeltaSplice、AbSplice 是剪接专用模型，ChromBPNet 是可及性专用模型，Borzoi 是多任务序列模型。“all-folds”指蒸馏模型使用了全部数据折。
+
+=== 26 | 3 | AlphaGenome | What we released || AlphaGenome 发布了什么
+h AlphaGenome | What we released || AlphaGenome | 我们发布了什么
+li 01 · PAPER IN NATURE (JAN 2026) — **{{Peer-Reviewed|同行评审的}} Publication** || 01 · 《自然》论文（2026 年 1 月）——**同行评审发表**
+l2 Published in Nature: “Advancing regulatory variant effect prediction with AlphaGenome” || 发表于《Nature》：《利用 AlphaGenome 推进调控变异的效应预测》
+li 02 · PYTHON {{SDK|软件开发工具包}} & CLOUD {{API|应用程序接口}} — **AlphaGenome API** || 02 · Python SDK 与云端 API——**AlphaGenome API**
+l2 Open-source Python package for interacting with {{cloud-hosted|云端托管的}} AlphaGenome model || 开源 Python 包，用来调用云端托管的 AlphaGenome 模型
+l2 Free for {{non-commercial|非商业的}} academic research · No specialist hardware required · Also available for commercial use via Cloud. || 非商业学术研究免费 · 不需要专门硬件 · 商业用途可通过 Google Cloud 使用
+li 03 · MODEL {{WEIGHTS|权重（模型参数）}} — **Model code & weights** || 03 · 模型权重——**模型代码与权重**
+l2 Open-source Model code and weights · Official {{JAX|JAX（谷歌的机器学习数值计算库）}} implementation on GitHub · Model weights available via Hugging Face or Kaggle for non-commercial use. || 开源模型代码与权重 · GitHub 上有官方 JAX 实现 · 模型权重可通过 Hugging Face 或 Kaggle 获取，仅限非商业用途
+c References: doi:10.1038/s41586-025-10014-0 · alphagenome.google/api · github.com/google-deepmind/alphagenome || 参考链接：论文 DOI · API 网址 · GitHub 代码库
+n 三种使用方式怎么选 || 在线 API：最省事，不需要 GPU，适合查询少量变异；本地运行开源代码和权重：需要 GPU 或 TPU，适合大规模计算或改造模型；论文：了解方法与评估细节。
+n 权重是什么 || 神经网络训练完成后得到的全部参数。开放权重意味着别人可以在自己的机器上运行、复现或微调这个模型。
+
+=== 27 | 4 | AlphaGenome Atlas || AlphaGenome Atlas 图谱
+h AlphaGenome {{Atlas|图谱}} || AlphaGenome Atlas（图谱）
+p **Genome-Wide Variant Effect Dataset** || **全基因组变异效应数据集**
+li **{{Pre-computed|预先计算的}} variant scores** for every SNV in the human genome || 人类基因组中每一个 SNV 的**预计算变异分数**
+li **One of the most {{comprehensive|全面的}} datasets** of how genetic mutations affect molecular biology. || 关于遗传突变如何影响分子生物学的**最全面数据集之一**
+p **Regulatory {{Motif|基序}} {{Compendium|汇编、大全}}** || **调控基序汇编**
+li Includes a **motif compendium of 2,500+ {{recurrent|反复出现的}} DNA sequences** across tissues and cell types. || 包含一个由 **2,500 多个**在各组织和细胞类型中反复出现的 DNA 序列组成的基序汇编
+p **Open Web {{Portal|门户网站}}, Download & API** || **开放网页门户、下载与 API**
+li Available through an **{{intuitive|直观的}}, free-to-use web portal** at `alphagenome.google/atlas` || 可通过**直观、免费的网页门户**使用：alphagenome.google/atlas
+li Also available for **{{bulk download|批量下载}}** and via **Python API**. || 也支持**批量下载**和 **Python API** 调用
+fh 数字卡片
+f ~9B Human SNVs — All possible {{GRCh38|人类参考基因组第 38 版}} SNVs & common {{indels|插入/缺失变异}} || 约 90 亿个人类 SNV——GRCh38 上所有可能的 SNV 以及常见的插入/缺失
+f ~27k Scores per Variant — Average number of scores per variant || 每个变异约 2.7 万个分数——平均每个变异的分数数量
+f 2500+ Motifs — Compendium of recurrent DNA sequences || 2500 多个基序——反复出现的 DNA 序列汇编
+n 为什么要“预计算” || 每次运行 AlphaGenome 都需要 GPU。把所有可能的 SNV 预先算好存起来，用户只要“查表”，不需要自己跑模型，对临床医生和不会编程的研究者尤其友好。
+n 每个变异 2.7 万个分数从哪来 || 一个变异在每种模态 × 每个组织/细胞类型 × 每个邻近基因上都有一个分数，加起来平均约 2.7 万个。
+n Motif（基序） || 短的、有特定功能的 DNA 序列模式，最典型的是转录因子结合位点（例如 CTCF 基序）。“recurrent”指在模型的解释结果中跨组织、跨细胞类型反复出现。
+n GRCh38 || Genome Reference Consortium human build 38，也叫 hg38，是目前主流的人类参考基因组版本。本讲中的坐标都基于它。
+
+=== 28 | 4 | AlphaGenome Variant Impact (AVI) | How the score is generated || AVI 分数是怎样生成的
+h AlphaGenome Variant {{Impact|影响}} (AVI) | How the score is generated || AlphaGenome 变异影响评分（AVI）| 分数是怎样生成的
+p A {{regularized|正则化的}} {{linear|线性的}} {{hypernetwork|超网络}} {{unifying|统一}} regulatory predictions, coding {{consequences|后果}}, and {{conservation|保守性}} into a {{calibrated|校准过的}} {{Phred score|Phred 分数}}. || 一个正则化的线性超网络，把调控预测、编码后果和进化保守性统一成一个经过校准的 Phred 分数。
+fh 流程图（从左到右）
+f AlphaGenome features — Feature scores: Splicing · {{Chromatin accessibility|染色质可及性}} · TF binding · {{Histone marks|组蛋白标记}} · {{Transcription initiation|转录起始}} · RNA-seq · {{Polyadenylation|多聚腺苷酸化}} · Contact Maps || AlphaGenome 特征——特征分数：剪接 · 染色质可及性 · 转录因子结合 · 组蛋白标记 · 转录起始 · RNA-seq · 多聚腺苷酸化 · 接触图
+f ⊕ Coding and other features — AlphaMissense · Protein {{loss-of-function|功能丧失}} · Conservation: Evolutionary conservation · Indel features: {{Insertion|插入}} · {{Deletion|缺失}} || ⊕ 编码及其他特征——AlphaMissense · 蛋白功能丧失 · 保守性：进化保守性 · 插入缺失特征：插入 · 缺失
+f → AVI model → Variant impact: Raw → {{Percentile|百分位}} → PHRED (top 10% → 10 · top 1% → 20 · top 0.1% → 30) || → AVI 模型 → 变异影响：原始分 → 百分位 → Phred（前 10% = 10 · 前 1% = 20 · 前 0.1% = 30）
+f ATLAS AVI OUTPUT — AVI score 34.2 Phred Score · Top 0.1% of genome-wide SNVs · {{Feature importance|特征重要性}} ({{SHAP|SHAP 值}}): Splicing (58% ↑) Splice donor loss · RNA-seq (26% ↓) · PhastCons 470 (16%) || Atlas 中的 AVI 输出示例——AVI 分数 34.2（Phred）· 位于全基因组 SNV 的前 0.1% · 特征重要性（SHAP）：剪接 58%（↑，剪接供体丧失）· RNA-seq 26%（↓）· PhastCons 470 保守性 16%
+n Phred 分数怎么换算 || Phred = −10 × log10（排名比例）。10 = 前 10%，20 = 前 1%，30 = 前 0.1%，每增加 10 分，稀有程度提高 10 倍。34.2 对应前约 0.04%（10^−3.42），影响比全基因组约 99.96% 的 SNV 都大。著名的 CADD 分数也使用这种标度。
+n 为什么要“统一”成一个分数 || AlphaGenome 对每个变异给出约 2.7 万个分数，临床医生没法逐一查看。AVI 把这些调控特征，与 AlphaMissense（编码区）、功能丧失注释、保守性合成一个可排序的数字，方便在成千上万个候选变异中挑出最可疑的那个。
+n “正则化线性超网络”怎么理解 || 线性：最终分数是各特征的加权组合，便于解释每个特征的贡献；正则化：训练时惩罚过大或过多的权重，防止过拟合；超网络（hypernetwork）一般指“由一个网络来生成另一个模型的参数”，这里可以理解为线性组合的权重不是固定的，而是由一个网络根据变异的情况给出。幻灯片没有展开细节，这只是一般性的理解，具体以 AlphaGenome Atlas 预印本为准。
+n SHAP 与箭头 || SHAP 是一种把模型输出拆解为各个输入特征贡献的方法。示例中剪接贡献 58%，RNA-seq 26%，保守性 16%。箭头表示该特征预测的效应方向（↑ 升高或增强，↓ 降低；例如 RNA-seq ↓ 表示预测表达下降）。
+n PhastCons 470 || 基于 470 种哺乳动物全基因组比对计算的进化保守性分数。数值越高，说明该位置在进化中越保守。
+
+=== 29 | 4 | AlphaGenome Atlas | What we released || AlphaGenome Atlas 发布了什么
+h AlphaGenome Atlas | What we released || AlphaGenome Atlas | 我们发布了什么
+li 01 · PRE-PRINT PAPER (SEPT 2026) — **{{Methodology|方法学}} & Evaluations** || 01 · 预印本论文（2026 年 9 月）——**方法与评估**
+l2 Introducing AlphaGenome Atlas, AVI scoring, and Motif compendium. · Evaluates AVI against variant impact benchmarks. · Example rare variant analyses by {{collaborators|合作者}} || 介绍 AlphaGenome Atlas、AVI 打分和基序汇编 · 在变异影响基准上评估 AVI · 合作者提供的罕见变异分析案例
+li 02 · ATLAS WEBSITE — **Interactive Browser Portal** || 02 · Atlas 网站——**交互式浏览门户**
+l2 {{Zero-code|零代码的}} web portal for interactive variant & {{locus|基因座（位点区域）}} analysis. · Investigate a specific variant in the {{variant view|变异视图}}. · Generate REF/ALT plots for a specific variant. · Search a specific interval or gene in the {{locus view|位点视图}}. || 无需编程的网页门户，可交互地分析变异和位点 · 在“变异视图”中查看某个具体变异 · 为某个变异生成参考/变异对比图 · 在“位点视图”中搜索某个区间或基因
+li 03 · API & BULK TABLES — **{{High-Throughput|高通量}} {{Annotation|注释}}** || 03 · API 与批量数据表——**高通量注释**
+l2 {{Programmatic|编程方式的}} Python API for bulk {{querying|查询}} of variant scores. · Download datasets for {{offline|离线}} processing. · AVI scores also available in {{VEP|Ensembl 变异效应预测工具}} and {{UCSC genome browsers|UCSC 基因组浏览器}}. || 用 Python API 以编程方式批量查询变异分数 · 下载数据集离线处理 · AVI 分数也可以在 VEP 和 UCSC 基因组浏览器中查到
+li 04 · AI AGENT SKILLS — **Automated {{Interpretation|解读}}** || 04 · AI 智能体技能——**自动化解读**
+l2 Use the AlphaGenome Atlas skill in Antigravity to enable {{AI agents|AI 智能体}} to automatically {{annotate|注释}} {{VCF files|VCF 变异文件}}. || 在 Antigravity 中使用 AlphaGenome Atlas 技能，让 AI 智能体自动注释 VCF 文件
+c alphagenome.google/atlas · alphagenome.google/downloads · antigravity.google || 对应网址
+n Pre-print（预印本） || 尚未经过同行评审、先公开发布的论文（例如发布在 bioRxiv 上）。
+n 变异视图 vs 位点视图 || 变异视图：聚焦一个变异，看它的所有分数和特征贡献（第 31–35 页演示的就是它）；位点视图：看一个区间或一个基因附近所有变异的整体情况，例如哪里是调控“热点”。
+n VCF 与 VEP || VCF（Variant Call Format）是存储测序检出变异的标准文本格式；VEP 是 Ensembl 的 Variant Effect Predictor，最常用的变异注释工具之一。在 VEP 中能直接查到 AVI，意味着可以无缝接入现有的分析流程。
+n Antigravity 与“skill” || Antigravity 是 Google 推出的智能体式开发环境；“skill”是一组交给 AI 智能体的操作说明和工具，让它能自动完成“读取 VCF → 查询分数 → 注释”这样的任务。
+
+=== 30 | 4 | Case study: Resolving variants of unknown significance (VUS) || 案例：判定意义未明的变异
+h {{Case study|案例研究}}: {{Resolving|解决、判定}} variants of unknown significance (VUS) || 案例研究：判定意义未明的变异（VUS）
+li Use AVI score to rank all {{candidate|候选的}} {{causal variants|致病（因果）变异}}. || 用 AVI 分数对所有候选致病变异进行排序。
+li Highest-scoring variant found in %%DNM1%%. || 得分最高的变异位于 %%DNM1%% 基因。
+li Use AlphaGenome Atlas to explore AVI and feature contributions for `chr9:128225994:G>A` || 用 AlphaGenome Atlas 查看 chr9:128225994:G>A 的 AVI 分数和各特征贡献
+fh 图 B：{{Proband|先证者}} {{pedigree|家系图}} and history
+f RGP_2167_1 · RGP_2167_2 (parents) → RGP_2167_3: Rare disease case (GREGoR) || 父母（RGP_2167_1、RGP_2167_2）→ 患儿 RGP_2167_3：罕见病病例（GREGoR 联盟）
+f 6 weeks: Infantile {{seizures|癫痫发作}} → Epilepsy {{gene panel|基因面板}} (negative) || 6 周龄：婴儿期癫痫发作 → 癫痫基因面板检测（阴性）
+f 6 months: {{Infantile spasms|婴儿痉挛症}} → {{WES|全外显子组测序}} (%%SLC22A5%% variants identified; treated for {{carnitine deficiency|肉碱缺乏症}}) || 6 月龄：婴儿痉挛症 → 全外显子组测序（发现 SLC22A5 变异，按肉碱缺乏症治疗）
+f {{Developmental delay|发育迟缓}} · {{Hypotonia|肌张力低下}} · {{Cortical visual impairment|皮质性视觉障碍}} → {{WGS|全基因组测序}} (negative) → RNA-seq (Tru-seq) → RNA-seq (long-read; watchmaker) || 发育迟缓 · 肌张力低下 · 皮质性视觉障碍 → 全基因组测序（阴性）→ RNA-seq（Tru-seq 建库）→ RNA-seq（长读长，Watchmaker 建库）
+f 5 years: AVI ranking: %%DNM1%% c.1335+1605G>A || 5 岁：AVI 排序锁定 DNM1 c.1335+1605G>A
+c Broad Institute || 案例来源：Broad 研究所
+n 一场“诊断奥德赛” || 从 6 周龄开始，患儿先后做了基因面板、全外显子组、全基因组和两种 RNA 测序，5 年都没找到真正的病因。SLC22A5 变异只能解释肉碱缺乏，解释不了癫痫性脑病的表现。
+n c.1335+1605G>A 怎么读 || c. 表示编码 DNA 坐标；1335 是编码序列第 1335 位（某个外显子的最后一个碱基）；+1605 表示从这里往下游的内含子方向数第 1605 个碱基；G>A 表示 G 变成 A。这是一个“深部内含子变异”（deep intronic variant），离常规剪接位点很远。
+n 为什么全基因组测序是“阴性” || WGS 其实测到了这个变异，但它埋在每个人都有的数百万个非编码变异里，常规流程（只看编码区和外显子边界附近几个碱基）无法判断它的意义。AVI 排序让它从海量变异中脱颖而出。
+n DNM1 || 编码 dynamin-1（发动蛋白 1），是神经元突触囊泡回收所必需的蛋白。其致病变异导致发育性和癫痫性脑病（DEE31），与患儿的婴儿痉挛、发育迟缓等表现一致。
+n 家系图符号 || 圆圈 = 女性，方块 = 男性，实心 = 患病。先证者（proband）是家系中第一个被发现或就诊的患者。GREGoR 是美国 NIH 资助的罕见病遗传研究联盟。
+
+=== 31 | 4 | (Atlas screenshot) || Atlas 演示①：变异视图
+d 本页为 AlphaGenome Atlas 网页截图（没有标题），下面整理的是截图中的文字。 ||
+fh 截图中的文字
+f Search: `chr9:128225994:G>A` · Tabs: Variant · Locus || 搜索框：chr9:128225994:G>A · 标签：变异 · 位点
+f AVI score: **24.7** Phred Score · Top 0.34% predicted impact of all genome-wide SNVs || AVI 分数：**24.7**（Phred）· 预测影响位于全基因组所有 SNV 的前 0.34%
+f Feature importance: Splicing · Cactus · PhastCons 470 (Positive) || 特征重要性：剪接 · Cactus · PhastCons 470（正向贡献）
+f Splicing (69.30%) Feature breakdown › Splice Site Usage · Splice Junctions · Splice Sites || 剪接（69.30%）特征分解 › 剪接位点使用率 · 剪接连接 · 剪接位点
+f Feature description · Interpretation · Precomputed scores for chr9:128225994:G>A · Filters: {{Biosample|生物样本}} · {{Strand|（DNA）链}} || 特征说明 · 解读 · 该变异的预计算分数 · 筛选：生物样本 · 链
+f {{dorsolateral prefrontal cortex|背外侧前额叶皮层}} 0.63 · {{anterior cingulate cortex|前扣带皮层}} 0.61 · {{frontal cortex|额叶皮层}} 0.60 · {{cerebellar hemisphere|小脑半球}} 0.59 · {{cerebellum|小脑}} 0.59 · {{nucleus accumbens|伏隔核}} 0.58 · {{hypothalamus|下丘脑}} 0.57 || 背外侧前额叶皮层 0.63 · 前扣带皮层 0.61 · 额叶皮层 0.60 · 小脑半球 0.59 · 小脑 0.59 · 伏隔核 0.58 · 下丘脑 0.57
+f Tracks for ref/alt plot: “Add tracks by selecting tracks from the feature breakdown or from the button below.” · + Add track · 0/10 · Clear all · Generate ref/alt plots || 用于参考/变异对比图的轨道：“从特征分解中或用下方按钮选择轨道并添加。”· + 添加轨道 · 0/10 · 全部清除 · 生成参考/变异对比图
+n 验算一下 || Phred 24.7 → 10^−2.47 ≈ 0.0034，正好是“前 0.34%”。（第 28 页的 34.2 只是示意例子，这个真实病例的分数是 24.7。）
+n 界面三栏 || 左栏：AVI 总分和特征重要性条（色块越长贡献越大，橙色的剪接占了绝大部分）；中栏：选中特征的分解，按组织/细胞类型列出分数；右栏：选择要画 REF/ALT 对比图的轨道。
+n 为什么得分最高的都是脑区 || 剪接位点使用率变化最大的组织几乎都是大脑区域（前额叶、扣带皮层、小脑等），与 DNM1 在神经元中高表达、患儿表现为神经系统疾病相符。
+n Cactus 与 PhastCons 470 || 两种进化保守性分数：Cactus 基于 Cactus 多物种全基因组比对；PhastCons 470 基于 470 种哺乳动物的比对。它们是 AVI 中的保守性特征。
+
+=== 32 | 4 | (Atlas screenshot) || Atlas 演示②：AVI 分数面板
+d 本页为 Atlas 截图，红框标出左侧 AVI 分数面板，鼠标悬停在 “Splicing” 上显示了说明。 ||
+fh 悬停提示原文
+f Splicing: A “merged splicing” approach, which combines three splicing-related variant {{scorers|打分器}} into a single score. || 剪接：采用“合并剪接”方法，把三个与剪接相关的变异打分器合并为一个分数。
+f The {{weighting scheme|加权方案}} gives full weight to changes in splice site {{identity|身份（是否为剪接位点）}} and usage, but a smaller weight to {{junction-level|剪接连接层面的}} changes because their {{magnitude|数值幅度}} is larger. || 该加权方案对“剪接位点身份”和“使用率”的变化给予全权重，而对剪接连接层面的变化给予较小权重，因为后者的数值幅度更大。
+f Contribution: 69.3% · {{Directional impact|方向性影响}}: 0.77 ↑ || 贡献：69.3% · 方向性影响：0.77 ↑
+n 三个剪接打分器 || 就是中栏的三个标签：Splice Sites（某位置是不是剪接位点，即“身份”）、Splice Site Usage（剪接位点被使用的比例）、Splice Junctions（外显子之间的连接强度）。
+n 为什么连接层面权重小 || 连接计数的变化在数值上通常更大，如果三者同权，连接分数会“压过”另外两项，所以给它较小的权重来平衡。
+n 0.77 ↑ || 方向性影响为正且较大，箭头向上：预测的剪接信号是“增强/新增”方向的变化，例如出现了新的剪接位点使用，与第 35 页图中 ALT 新出现的剪接峰一致。
+
+=== 33 | 4 | (Atlas screenshot) || Atlas 演示③：按生物样本筛选
+d 本页为 Atlas 截图，演示如何筛选生物样本并添加轨道。 ||
+fh 截图中的文字
+f Filter with biosample — “Select one or more options from the list below.” · typed: gluta → {{glutamatergic neuron|谷氨酸能神经元}} || 按生物样本筛选——“从下方列表中选择一个或多个选项。”· 输入 gluta → 谷氨酸能神经元
+f Tracks for ref/alt plot: + Add track (highlighted) || 右侧：+ 添加轨道（红框标出）
+n 操作步骤 || ① 点击中栏的 Biosample 筛选器；② 输入关键词（这里是 “gluta”），找到与疾病相关的细胞类型“谷氨酸能神经元”；③ 用右侧的 “+ Add track” 把感兴趣的轨道加入对比图。
+n 生物样本（biosample） || ENCODE 等数据库对组织、细胞系、原代细胞、体外分化细胞等样本的统称。
+n 为什么选谷氨酸能神经元 || 谷氨酸能神经元是大脑中主要的兴奋性神经元，DNM1 相关的癫痫性脑病正是神经元功能异常，所以这是最“对口”的细胞类型。
+
+=== 34 | 4 | (Atlas screenshot) || Atlas 演示④：选择对比轨道
+d 本页为 Atlas 截图，红框标出已选好的 4 条轨道。 ||
+fh 截图中的文字
+f RNA-seq (0.21%) Feature breakdown · Group by: Biosample · Biosample: glutamatergic n… & 1 more · Strand · Gene: DNM1 || RNA-seq（贡献 0.21%）特征分解 · 按生物样本分组 · 生物样本：谷氨酸能神经元等 2 项 · 链 · 基因：DNM1
+f Top 3 tracks: {{small intestine|小肠}} −0.02 · {{aorta|主动脉}} −0.02 · heart right {{ventricle|心室}} −0.02 || 变化最大的 3 条轨道：小肠 −0.02 · 主动脉 −0.02 · 心脏右心室 −0.02
+f Tracks from filter results (2): glutamatergic neuron −0.01 · {{venous blood|静脉血}} −0.01 || 筛选结果中的轨道（2 条）：谷氨酸能神经元 −0.01 · 静脉血 −0.01
+f Selected (4/10): Splice Site Usage • total RNA-seq • encode • glutamatergic neuron • (+) • DNM1 · RNA-seq • total RNA-seq • glutamatergic neuron • (+) • DNM1 · Splice Site Usage • polyA plus RNA-seq • gtex • venous blood • (+) • DNM1 · RNA-seq • polyA plus RNA-seq • venous blood • (+) • DNM1 → Generate ref/alt plots || 已选 4 条（上限 10）：谷氨酸能神经元的剪接位点使用率与 RNA-seq（总 RNA，ENCODE）· 静脉血的剪接位点使用率与 RNA-seq（polyA+ RNA，GTEx）→ 点击“生成参考/变异对比图”
+n RNA-seq 只贡献 0.21% || 各组织中 DNM1 总表达量的变化都很小（−0.01 到 −0.02），说明这个变异的主要作用不是改变“表达多少”，而是改变“怎么剪接”。
+n 为什么还选静脉血 || 一种合理的思路：病变组织（大脑）无法取样，而血液最容易获取。如果预测显示血液中也能看到异常剪接，就可以通过抽血做 RNA 测序来验证这个预测。
+n total RNA-seq 与 polyA plus RNA-seq || 总 RNA 测序包括未成熟的前体 RNA 和非编码 RNA；polyA+ RNA 测序只捕获带 polyA 尾的成熟 mRNA。
+n (+) || 表示正链。DNM1 位于正链上，从左向右转录。
+
+=== 35 | 4 | (Atlas screenshot) || Atlas 演示⑤：参考/变异对比图
+d 本页为 Atlas 生成的 REF/ALT 对比图。 ||
+fh 图中文字
+f Predicted impact of `chr9:128225994:G>A` · chr9:128225969-128226210 • 241 bp · GENCODE v46 (GRCh38/hg38) · — Reference — Alternate || chr9:128225994:G>A 的预测影响 · 显示区间 241 bp · 基因注释 GENCODE v46（GRCh38/hg38）· 蓝线 = 参考，红线 = 变异
+f Tracks: Splice Site Usage (glutamatergic neuron) · RNA-seq (glutamatergic neuron) · Splice Site Usage (venous blood) · RNA-seq (venous blood) || 四条轨道：剪接位点使用率（谷氨酸能神经元）· RNA-seq（谷氨酸能神经元）· 剪接位点使用率（静脉血）· RNA-seq（静脉血）
+n 图怎么读 || 蓝色竖线标出变异位置（chr9:128,225,994），DNM1 从左向右转录。每条轨道中蓝色 = 参考序列（REF）的预测，红色 = 变异序列（ALT）的预测。
+n 从图上能看出什么 || 这是根据图形做的解读，仅供参考。剪接位点使用率轨道：REF（蓝）在变异右侧约 40 bp 处有一个剪接峰；ALT（红）则在紧挨变异的下游出现了一个新峰，而原来的蓝色峰在 ALT 中变弱。RNA-seq 轨道：在谷氨酸能神经元中，ALT 的覆盖度从新位点就开始升高，比 REF 提前约 40 bp；在静脉血中，ALT 在整段区域的覆盖度都高于 REF。合在一起提示：这个 G>A 变异制造了一个新的剪接位点，改变了这段内含子序列被纳入 mRNA 的方式（使一段外显子样序列延长，或被更多地保留下来）。
+n 临床意义 || 多出来的序列可能引入提前终止密码子或造成移码，使 DNM1 功能丧失，从而解释患儿的癫痫性脑病。这类预测还需要实验验证，例如用患者血液做 RNA 测序。
+
+=== 36 | 4 | AlphaGenome Atlas | Hands-on exploration || 动手练习
+h AlphaGenome Atlas | {{Hands-on|动手实践的}} exploration || AlphaGenome Atlas | 动手探索
+li 01 · **Launch Atlas** — [[https://alphagenome.google/atlas|https://alphagenome.google/atlas]] · Click on ‘Try AlphaGenome Atlas’ to launch || 01 · **启动 Atlas**——打开网址，点击 “Try AlphaGenome Atlas” 启动
+li 02 · **Explore variants/{{loci|位点（locus 的复数）}}** — Explore a variant or locus of your choice or try answering the questions below || 02 · **探索变异/位点**——探索你自己感兴趣的变异或位点，或者试着回答下面的问题
+li 03 · **Tutorials & Community** — User guides at alphagenomedocs.com & alphagenomecommunity.com || 03 · **教程与社区**——用户指南见 alphagenomedocs.com 和 alphagenomecommunity.com
+p **Exercise A.** Look at the {{immunodeficiency|免疫缺陷}} variant `chrX:101386224:T>C` in the **variant view**: || **练习 A**：在**变异视图**中查看免疫缺陷相关变异 chrX:101386224:T>C：
+l2 1. Which **gene** shows the largest expression change? **increase** or **decrease**? %%(hint: use ‘group by’)%% || 1. 哪个**基因**的表达变化最大？是**升高**还是**降低**？%%（提示：使用 “group by” 分组）%%
+l2 2. Which specific **cell type** experiences the strongest predicted {{transcriptional effect|转录效应}} of this gene? %%(hint: use ‘group by’ and ‘filter’)%% || 2. 在哪种具体的**细胞类型**中，这个基因受到的预测转录效应最强？%%（提示：结合使用“分组”和“筛选”）%%
+l2 3. Which **transcription factor binding** is {{disrupted|被破坏的}}, and in **which cell type** does this occur? %%(hint: navigate to the {{ChIP-TF|转录因子 ChIP-seq}} feature)%% || 3. 哪个**转录因子的结合**被破坏了？发生在**哪种细胞类型**中？%%（提示：进入 ChIP-TF 特征）%%
+p **Exercise B.** Look at the gene **NAGS** in the **locus view**, a NAGS {{deficiency|缺乏症}} can lead to a {{urea|尿素}} processing disorder: || **练习 B**：在**位点视图**中查看 **NAGS** 基因（NAGS 缺乏会导致尿素代谢障碍）：
+l2 1. Do you see any potential **{{regulatory regions|调控区域}}** {{upstream|上游}} of the gene? %%(hint: look at the top AVI plot for an overview)%% || 1. 你能在该基因**上游**看到潜在的**调控区域**吗？%%（提示：先看最上方的 AVI 图获得整体印象）%%
+l2 2. Do any of these regulatory regions lead to a **reduction** in **NAGS expression** in {{HepG2|HepG2 肝癌细胞系}} cells? %%(hint: use the modality overview track and filter by gene/ biosample)%% || 2. 这些调控区域中，是否有变异会使 HepG2 细胞中的 **NAGS 表达降低**？%%（提示：使用模态概览轨道，并按基因/生物样本筛选）%%
+l2 3. Are there any **{{motifs|基序}}** in this area that help explain the predicted effects? %%(hint: click on the relevant {{heatmap tile|热图格子}} to ‘add track’)%% || 3. 这个区域里有没有能帮助解释这些预测效应的**基序**？%%（提示：点击相应的热图格子来“添加轨道”）%%
+n 练习 A 的思路（不剧透答案） || X 染色体上的变异常与 X 连锁遗传病有关，男性只有一条 X，携带即可能发病。思路：先在 RNA-seq 特征中按基因分组，找变化最大的基因；再按生物样本分组和筛选，看哪类免疫细胞（如 B 细胞、T 细胞、单核细胞）效应最强；最后进入 ChIP-TF 特征，看哪个转录因子的结合信号在 REF 与 ALT 之间差异最大。
+n 练习 B 的背景 || NAGS 编码 N-乙酰谷氨酸合成酶，它产生的 N-乙酰谷氨酸是尿素循环第一步酶 CPS1 的必需激活剂；NAGS 缺乏会导致血氨升高（高氨血症）。NAGS 主要在肝脏表达，所以题目用肝细胞系 HepG2。
+n “上游（upstream）” || 指基因转录起始位点之前（5′ 方向）的区域，启动子和许多增强子都位于这里。注意：对于负链上的基因，“上游”在坐标上是数值更大的一侧。
+n 基序题的思路 || 调控区域中 AVI 高分的位置，往往正好落在某个转录因子的结合基序上。点击热图格子把对应轨道加入图中，再看这些位置的序列是否与已知基序吻合。
+
+=== 37 | 5 | Thank you. || 结束
+h Thank you. || 谢谢。
