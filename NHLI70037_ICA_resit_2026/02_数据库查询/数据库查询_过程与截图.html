@@ -1,0 +1,124 @@
+<!doctype html><html lang='zh'><head><meta charset='utf-8'><title>数据库查询：过程与截图</title><style>
+@page { size: A4; margin: 14mm 12mm 16mm 12mm; }
+body { font-family: 'WenQuanYi Zen Hei', 'Noto Sans CJK SC', Arial, sans-serif; font-size: 10.5pt; color: #111; line-height: 1.5; }
+h1 { font-size: 18pt; margin: 0 0 4px; } h2 { font-size: 13.5pt; border-bottom: 2px solid #b00; padding-bottom: 2px; margin-top: 22px; page-break-after: avoid; }
+h3 { font-size: 11.5pt; margin: 14px 0 4px; page-break-after: avoid; }
+.meta { color: #444; font-size: 9.5pt; }
+table { border-collapse: collapse; width: 100%; margin: 6px 0 10px; font-size: 9.3pt; page-break-inside: auto; }
+th, td { border: 1px solid #aaa; padding: 3px 5px; vertical-align: top; } th { background: #eef2f8; }
+tr { page-break-inside: avoid; }
+.mono { font-family: 'DejaVu Sans Mono', monospace; font-size: 8.6pt; white-space: nowrap; }
+.hl { background: #ffe600; outline: 1.5px solid #d00; font-weight: bold; }
+tr.odd td { background: #fff3f0; }
+figure { margin: 10px 0 16px; page-break-inside: avoid; }
+figure img { width: 100%; border: 1px solid #999; }
+figcaption { font-size: 9pt; margin-top: 3px; } .src { color: #555; font-size: 8pt; word-break: break-all; }
+.box { border: 1.5px solid #b00; background: #fff8f6; padding: 6px 10px; margin: 8px 0; }
+.need { color: #b00; font-weight: bold; }
+code { font-family: 'DejaVu Sans Mono', monospace; font-size: 9pt; background: #f3f3f3; padding: 0 2px; }
+ol li, ul li { margin: 2px 0; }
+</style></head><body>
+<h1>数据库查询：过程与截图</h1>
+<div class="meta">NHLI70037 ICA resit 2026 · Bob · SCN1A 变异（题目写法 c.3993C&gt;T，p.Asp1331Glu）<br>
+查询时间：2026-11-04 23:30–23:57 UTC（每张图的来源栏有精确访问时间）　｜　文档生成：2026-11-05<br>
+浏览器：云端容器内 Chromium（Playwright 驱动），<b>不是你的 Chrome</b>（本会话没有 Claude in Chrome）。黄色高亮、红色圆角框和顶部来源栏是我加的，页面内容未改动。<br>
+NCBI 网页（nuccore、ClinVar、PubMed、PMC）对该浏览器弹出图片验证码，<b>按规则未点击、未绕过</b>；相关查询改用 NCBI E-utilities 官方接口在浏览器中显示，或用等效公开数据库（gnomAD、VariantValidator、Mutalyzer、UniProt）代替。</div>
+
+<h2>0. 结论汇总</h2>
+<table>
+<tr><th>#</th><th>问题</th><th>结果</th><th>依据</th></tr>
+<tr><td>1</td><td>题目写法 c.3993C&gt;T (p.Asp1331Glu) 是否成立</td><td><b>不成立。</b>c. 与 p. 互相矛盾（第 3 位 C&gt;T 只能把 GAC 变成 GAT，仍是 Asp）；MANE 转录本 c.3993 参考碱基为 A，第 1331 位为 Glu</td><td>D02–D07</td></tr>
+<tr><td>2</td><td>参考转录本</td><td>NM_001165963.4 = MANE Select（= ENST00000674923.1），编码 NP_001159435.1（2009 aa，与 UniProt P35498 序列一致）</td><td>D01、D06</td></tr>
+<tr><td>3</td><td>最可能的真实变异（<b>推断</b>）</td><td>NM_001165963.4:c.3993A&gt;T 或 c.3993A&gt;C → p.(Glu1331Asp)；GRCh38 chr2:166009728 T&gt;A / T&gt;G（GRCh37 166866238）</td><td>D02、D06</td></tr>
+<tr><td>4</td><td>gnomAD v4.1.2</td><td>该位点<b>没有任何变异</b>（已勾选 Indels 和 Filtered variants）；覆盖良好；相邻位点 AN ≈ 1,605,000</td><td>D08–D11</td></tr>
+<tr><td>5</td><td>ClinVar</td><td>第 1331 位无记录；邻近 1328、1329、1333 位有 P/LP 错义</td><td>D12、D13</td></tr>
+<tr><td>6</td><td>旁系同源对应位点</td><td>SCN2A p.Glu1321Gln = LP（1 个提交者）；SCN8A p.Glu1311Val = VUS；SCN3A 无记录</td><td>D14、D29</td></tr>
+<tr><td>7</td><td>基因层面</td><td>Dravet、GEFS+、DEE 均 Definitive；HI score 3；错义 Z = 8.78；pLoF o/e = 0.07（pLI = 1）</td><td>D01、D15、D16</td></tr>
+<tr><td>8</td><td>蛋白位置</td><td>E1331 位于 DIII S4 跨膜螺旋（1314–1332）的胞内端，紧邻 S4–S5 linker</td><td>D17</td></tr>
+<tr><td>9</td><td>计算预测（p.Glu1331Asp）</td><td>REVEL 0.613（Pejaver 2022 校准的不确定区间：PP3 和 BP4 都不适用）；AlphaMissense 0.85；CADD 23–26；SpliceAI 全部 0.00</td><td>D07、D18–D21</td></tr>
+<tr><td>10</td><td>保守性（手动比对）</td><td>E 在 9 个人类 Nav 旁系同源和四足动物直系同源中保守；<b>斑马鱼 scn1laa 为 D</b>，果蝇 para 为 Q</td><td>表 A1</td></tr>
+<tr><td>11</td><td>ClinGen VCEP SCN1A 细则 v2.0</td><td>PM1 适用（PER #10 含 1331）；PM2 仅 Supporting；PP2、PP4 不适用；PP3 用 REVEL 且封顶 Moderate；PS2/PM6 按表型计分</td><td>D22–D29</td></tr>
+</table>
+
+<h2>A. 命名与参考序列核对</h2>
+<div class="box"><b>推导（不依赖任何数据库）</b>：密码子 n 占 c.(3n−2)～c.3n；3993 = 3 × 1331，所以 c.3993 是第 1331 号密码子的<b>第 3 位</b>。Asp 的密码子是 GAT/GAC，Glu 是 GAA/GAG（图 D03）。第 3 位 C&gt;T 只能把 GAC 变成 GAT（仍是 Asp，同义）；Asp→Glu 必须是第 3 位变成 A 或 G。因此 “c.3993C&gt;T (p.Asp1331Glu)” 在任何转录本上都不可能同时成立。</div>
+<h3>A1　参考转录本是 MANE Select</h3>
+<p>gnomAD 基因页列出 MANE Select = ENST00000674923.1 / NM_001165963.4（D01）；VariantValidator 结果也标注 Transcript Flag: MANE Select（D06）。<span class="need">【需查】</span>NCBI RefSeq 页面（KEYWORDS “MANE Select”）因验证码未能截图；我用 E-utilities 下载的 GenBank 记录核对过：KEYWORDS = “RefSeq; MANE Select.”，CDS 479..6508，转录本第 4469–4471 位 = gaa（c.3991–3993）。需要的话请在你的 Chrome 打开 https://www.ncbi.nlm.nih.gov/nuccore/NM_001165963.4 补截。</p>
+<figure id="D01"><img src="screenshots/D01_gnomAD_MANE与基因约束.jpg"><figcaption><b>图 D01</b>　gnomAD v4.1.2 SCN1A 基因页：MANE Select = ENST00000674923.1 / NM_001165963.4；错义约束 Z = 8.78（o/e 0.58）；pLoF o/e 0.07（90% CI 上限 0.11），pLI = 1<br><span class="src">文件：screenshots/D01_gnomAD_MANE与基因约束.jpg　|　来源：https://gnomad.broadinstitute.org/gene/ENSG00000144285?dataset=gnomad_r4　|　访问：2026-11-04 23:41 UTC</span></figcaption></figure>
+<h3>A2　遗传密码</h3>
+<figure id="D03"><img src="screenshots/D03_NCBI_标准遗传密码表_Asp_Glu.jpg"><figcaption><b>图 D03</b>　NCBI 标准遗传密码（transl_table=1）：D(Asp) = GAT、GAC；E(Glu) = GAA、GAG。第三位 C&gt;T（GAC→GAT）仍为 Asp，不可能得到 Glu<br><span class="src">文件：screenshots/D03_NCBI_标准遗传密码表_Asp_Glu.jpg　|　来源：https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi?mode=t#SG1　|　访问：2026-11-04 23:41 UTC</span></figcaption></figure>
+<h3>A3　题目写法校验：两个独立工具都报参考碱基不符</h3>
+<figure id="D04"><img src="screenshots/D04_VariantValidator_c3993CT_参考碱基不符.jpg"><figcaption><b>图 D04</b>　VariantValidator：题目写法 NM_001165963.4:c.3993C&gt;T → ReferenceMismatchError：Variant reference (C) does not agree with reference sequence (A)<br><span class="src">文件：screenshots/D04_VariantValidator_c3993CT_参考碱基不符.jpg　|　来源：https://variantvalidator.org/service/validate/ （表单提交 NM_001165963.4:c.3993C&gt;T，GRCh38，mane_select）　|　访问：2026-11-04 23:41 UTC</span></figcaption></figure>
+<figure id="D05"><img src="screenshots/D05_Mutalyzer_c3993CT_参考碱基不符.jpg"><figcaption><b>图 D05</b>　Mutalyzer 3（独立第二个工具）：c.3993C&gt;T → “`C` was not found in the reference sequence; `A` was found instead.”<br><span class="src">文件：screenshots/D05_Mutalyzer_c3993CT_参考碱基不符.jpg　|　来源：https://mutalyzer.nl/normalizer/NM_001165963.4:c.3993C%3ET　|　访问：2026-11-04 23:42 UTC</span></figcaption></figure>
+<h3>A4　推断写法校验：c.3993A&gt;T 成立，给出 p.(Glu1331Asp) 和基因组坐标</h3>
+<figure id="D02"><img src="screenshots/D02_Mutalyzer_c3993AT_参考碱基A_Glu1331.jpg"><figcaption><b>图 D02</b>　Mutalyzer 3：NM_001165963.4:c.3993A&gt;T 通过校验，r.(3993a&gt;u)，p.(Glu1331Asp) —— 说明 c.3993 参考碱基是 A、第 1331 位是 Glu<br><span class="src">文件：screenshots/D02_Mutalyzer_c3993AT_参考碱基A_Glu1331.jpg　|　来源：https://mutalyzer.nl/normalizer/NM_001165963.4:c.3993A%3ET　|　访问：2026-11-04 23:43 UTC</span></figcaption></figure>
+<figure id="D06"><img src="screenshots/D06_VariantValidator_c3993AT_Glu1331Asp_GRCh38.jpg"><figcaption><b>图 D06</b>　VariantValidator：推断写法 NM_001165963.4:c.3993A&gt;T（Transcript Flag: MANE Select）→ NP_001159435.1:p.(Glu1331Asp)；GRCh38 NC_000002.12:g.166009728T&gt;A（GRCh37 g.166866238T&gt;A）<br><span class="src">文件：screenshots/D06_VariantValidator_c3993AT_Glu1331Asp_GRCh38.jpg　|　来源：https://variantvalidator.org/service/validate/ （表单提交 NM_001165963.4:c.3993A&gt;T，GRCh38，mane_select）　|　访问：2026-11-04 23:42 UTC</span></figcaption></figure>
+<h3>A5　dbNSFP 注释：参考密码子 GAA、第 3 位、第 1331 位</h3>
+<figure id="D07"><img src="screenshots/D07_dbNSFP_参考密码子GAA_REVEL.jpg"><figcaption><b>图 D07</b>　MyVariant.info（dbNSFP，GRCh37 chr2:166866238 T&gt;A）：① CADD PHRED 25.9 ② alt aa = D ③ 密码子第 3 位 ④ 蛋白位置 1331（MANE）⑤ ref aa = E ⑥ 参考密码子 GAA ⑦ REVEL 0.613<br><span class="src">文件：screenshots/D07_dbNSFP_参考密码子GAA_REVEL.jpg　|　来源：https://myvariant.info/v1/variant/chr2:g.166866238T%3EA?assembly=hg19&amp;fields=dbnsfp.revel,dbnsfp.alphamissense,cadd.phred,dbnsfp.aa　|　访问：2026-11-04 23:52 UTC</span></figcaption></figure>
+<p>补充（脚本核对，未截图）：我把 NCBI 上 5 个 SCN1A RefSeq 转录本逐一翻译，c.3993 在全部转录本上都是 A；第 1331 位分别为 E（NM_001165963.4、NM_001202435.3、NM_001353948.2）、G（NM_006920.6）、L（NM_001165964.3），<b>没有一个是 Asp</b>。</p>
+
+<h2>B. 人群数据（gnomAD v4.1.2）</h2>
+<ol>
+<li>打开区域 2-166009698-166009758（c.3993 前后各 30 bp），勾选 SNVs、Indels、<b>Filtered variants</b>、Exomes、Genomes（D08）。</li>
+<li>变异表按位置排序：2-166009725（c.3996）之后直接是 2-166009733（c.3988），<b>2-166009728 没有任何变异</b>。相邻位点 AN ≈ 1,605,000 个等位基因，远超 VCEP 要求的 10,000。</li>
+<li>覆盖度图（D09）：第 31 根柱 = chr2:166009728，约 0.95 的个体覆盖 ≥20×。gnomAD API 数值：外显子 mean 29.3×、98% ≥20×；基因组 mean 30.6×、94% ≥20×。</li>
+<li>直接打开两个可能变异的页面，均为 “Variant not found”（D10、D11）。gnomAD API 另外确认 2-166009728-T-C 也不存在（该位点三种替换都没有）。</li>
+</ol>
+<figure id="D08"><img src="screenshots/D08_gnomAD_区域变异表_166009728无变异.jpg"><figcaption><b>图 D08</b>　gnomAD v4.1.2 区域 2-166009698-166009758：勾选 Indels 与 Filtered variants 后共 26 个变异；2-166009725（p.Gly1332Gly）与 2-166009733（p.Phe1330Leu）之间没有 2-166009728 的任何变异；相邻位点 AN ≈ 1,605,000 个等位基因<br><span class="src">文件：screenshots/D08_gnomAD_区域变异表_166009728无变异.jpg　|　来源：https://gnomad.broadinstitute.org/region/2-166009698-166009758?dataset=gnomad_r4 （已勾选 SNVs、Indels、Filtered variants、Exomes、Genomes）　|　访问：2026-11-04 23:46 UTC</span></figcaption></figure>
+<figure id="D09"><img src="screenshots/D09_gnomAD_覆盖度_166009728.jpg"><figcaption><b>图 D09</b>　gnomAD v4.1.2 覆盖度（指标 Over 20）：61 bp 区段共 61 根柱，第 31 根 = chr2:166009728（c.3993），约 0.95 的个体覆盖 ≥20×。API 数值：外显子 mean 29.3×、98% ≥20×；基因组 mean 30.6×、94% ≥20×<br><span class="src">文件：screenshots/D09_gnomAD_覆盖度_166009728.jpg　|　来源：https://gnomad.broadinstitute.org/region/2-166009698-166009758?dataset=gnomad_r4　|　访问：2026-11-04 23:48 UTC</span></figcaption></figure>
+<figure id="D10"><img src="screenshots/D10_gnomAD_2-166009728-T-A_未找到.jpg"><figcaption><b>图 D10</b>　gnomAD v4.1.2：2-166009728-T-A（= c.3993A&gt;T，p.Glu1331Asp）“Variant not found”<br><span class="src">文件：screenshots/D10_gnomAD_2-166009728-T-A_未找到.jpg　|　来源：https://gnomad.broadinstitute.org/variant/2-166009728-T-A?dataset=gnomad_r4　|　访问：2026-11-04 23:44 UTC</span></figcaption></figure>
+<figure id="D11"><img src="screenshots/D11_gnomAD_2-166009728-T-G_未找到.jpg"><figcaption><b>图 D11</b>　gnomAD v4.1.2：2-166009728-T-G（= c.3993A&gt;C，p.Glu1331Asp）“Variant not found”<br><span class="src">文件：screenshots/D11_gnomAD_2-166009728-T-G_未找到.jpg　|　来源：https://gnomad.broadinstitute.org/variant/2-166009728-T-G?dataset=gnomad_r4　|　访问：2026-11-04 23:44 UTC</span></figcaption></figure>
+
+<h2>C. 临床数据库</h2>
+<p>ClinVar 网页对容器浏览器弹验证码（未点），改用 NCBI E-utilities 在浏览器中显示检索结果。另用脚本下载了 SCN1A 全部 5,556 条 ClinVar 记录的摘要，按标题筛选第 1331 位：<b>0 条</b>；邻近 1328–1333 位的记录见 D13。</p>
+<figure id="D12"><img src="screenshots/D12_ClinVar_第1331位无记录.jpg"><figcaption><b>图 D12</b>　ClinVar（NCBI E-utilities 检索；ClinVar 网页对容器浏览器弹验证码，未点）：与第 1331 号密码子（GRCh38 chr2:166009728–166009730）重叠的记录数 count = 0<br><span class="src">文件：screenshots/D12_ClinVar_第1331位无记录.jpg　|　来源：https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=clinvar&amp;term=2%5Bchr%5D+AND+166009728%3A166009730%5Bchrpos38%5D&amp;retmode=json　|　访问：2026-11-04 23:49 UTC</span></figcaption></figure>
+<figure id="D13"><img src="screenshots/D13_ClinVar_邻近残基P_LP错义.jpg"><figcaption><b>图 D13</b>　ClinVar（E-utilities esummary）：邻近残基的 P/LP 错义 —— p.Ser1328Pro（P/LP）、p.Arg1329Pro（P）、p.Arg1329Leu（P）、p.Met1333Ile（LP）<br><span class="src">文件：screenshots/D13_ClinVar_邻近残基P_LP错义.jpg　|　来源：https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&amp;id=2203183,2169505,1916226,2430161&amp;retmode=json　|　访问：2026-11-04 23:49 UTC</span></figcaption></figure>
+<figure id="D14"><img src="screenshots/D14_ClinVar_旁系同源对应位点.jpg"><figcaption><b>图 D14</b>　ClinVar（E-utilities esummary）：旁系同源对应位点 —— SCN2A p.Glu1321Gln = Likely pathogenic（criteria provided, single submitter）；SCN8A p.Glu1311Val = Uncertain significance<br><span class="src">文件：screenshots/D14_ClinVar_旁系同源对应位点.jpg　|　来源：https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&amp;id=2036225,2842560&amp;retmode=json　|　访问：2026-11-04 23:49 UTC</span></figcaption></figure>
+<figure id="D15"><img src="screenshots/D15_ClinGen_基因疾病有效性.jpg"><figcaption><b>图 D15</b>　ClinGen：SCN1A 与 Dravet syndrome、GEFS+、genetic DEE 的基因–疾病关系均为 Definitive（AD，Epilepsy GCEP）<br><span class="src">文件：screenshots/D15_ClinGen_基因疾病有效性.jpg　|　来源：https://search.clinicalgenome.org/kb/genes/HGNC:10585　|　访问：2026-11-04 23:49 UTC</span></figcaption></figure>
+<figure id="D16"><img src="screenshots/D16_ClinGen_剂量敏感性HI3.jpg"><figcaption><b>图 D16</b>　ClinGen 剂量敏感性：SCN1A HI score 3（Sufficient Evidence for Haploinsufficiency），07/06/2012<br><span class="src">文件：screenshots/D16_ClinGen_剂量敏感性HI3.jpg　|　来源：https://search.clinicalgenome.org/kb/genes/HGNC:10585　|　访问：2026-11-04 23:51 UTC</span></figcaption></figure>
+
+<h2>D. 蛋白位置</h2>
+<figure id="D17"><img src="screenshots/D17_UniProt_拓扑_DIII_S4.jpg"><figcaption><b>图 D17</b>　UniProt P35498 条目（纯文本版）：FT TRANSMEM 1314..1332 /note=&quot;Helical; Name=S4 of repeat III&quot;；1333..1345 为胞质侧（S4–S5 linker）。E1331 位于 DIII S4 电压感受器的胞内端<br><span class="src">文件：screenshots/D17_UniProt_拓扑_DIII_S4.jpg　|　来源：https://rest.uniprot.org/uniprotkb/P35498.txt　|　访问：2026-11-04 23:52 UTC</span></figcaption></figure>
+
+<h2>E. 计算预测</h2>
+<p>p.(Glu1331Asp) 可由 c.3993A&gt;T 或 c.3993A&gt;C 产生，蛋白层面完全相同；两者的 REVEL、AlphaMissense 一致。Ensembl VEP 接口查询时返回 503/500，故改用 dbNSFP（D07）和 SpliceAI-lookup（D18–D21）。</p>
+<p><b>REVEL 阈值</b>（Pejaver 等 2022，表 2；VCEP 指定 REVEL）：PP3_Supporting ≥0.644，Moderate ≥0.773，Strong ≥0.932；BP4_Supporting ≤0.290，Moderate ≤0.183，Strong ≤0.016，Very Strong ≤0.003。0.613 落在 0.290–0.644 之间 → <b>PP3 和 BP4 都不适用</b>。阈值是通过 PMC 开放获取全文接口（PMC9748256）读出来核对的；PMC 网页对容器浏览器弹验证码，<span class="need">【需查】原文表 2 截图请在你的 Chrome 补</span>。SpliceAI-lookup 页面给 REVEL 0.613 记 0 分，与此一致（D19）。</p>
+<figure id="D18"><img src="screenshots/D18_SpliceAI_TA_剪接预测.jpg"><figcaption><b>图 D18</b>　SpliceAI-lookup（MANE Select，T&gt;A）：SpliceAI 四项 Δ 均为 0.00（Donor Loss 位于 −9 bp）；Pangolin Splice Loss 0.01 —— 无剪接影响证据<br><span class="src">文件：screenshots/D18_SpliceAI_TA_剪接预测.jpg　|　来源：https://spliceailookup.broadinstitute.org/#variant=chr2-166009728-T-A&amp;hg=38&amp;bc=basic&amp;distance=500&amp;mask=0&amp;ra=0　|　访问：2026-11-04 23:55 UTC</span></figcaption></figure>
+<figure id="D19"><img src="screenshots/D19_SpliceAI_TA_REVEL_AlphaMissense.jpg"><figcaption><b>图 D19</b>　SpliceAI-lookup “Other scores”（T&gt;A，MANE）：REVEL 0.613 → 0 points（Pejaver 2022 校准下的不确定区间）；AlphaMissense 0.8497（+1）；CADD 23.1<br><span class="src">文件：screenshots/D19_SpliceAI_TA_REVEL_AlphaMissense.jpg　|　来源：https://spliceailookup.broadinstitute.org/#variant=chr2-166009728-T-A&amp;hg=38&amp;bc=basic&amp;distance=500&amp;mask=0&amp;ra=0　|　访问：2026-11-04 23:56 UTC</span></figcaption></figure>
+<figure id="D20"><img src="screenshots/D20_SpliceAI_TG_剪接预测.jpg"><figcaption><b>图 D20</b>　SpliceAI-lookup（MANE Select，T&gt;G = c.3993A&gt;C）：SpliceAI 四项 Δ 均为 0.00；Pangolin ≤0.01<br><span class="src">文件：screenshots/D20_SpliceAI_TG_剪接预测.jpg　|　来源：https://spliceailookup.broadinstitute.org/#variant=chr2-166009728-T-G&amp;hg=38&amp;bc=basic&amp;distance=500&amp;mask=0&amp;ra=0　|　访问：2026-11-04 23:55 UTC</span></figcaption></figure>
+<figure id="D21"><img src="screenshots/D21_SpliceAI_TG_REVEL_AlphaMissense.jpg"><figcaption><b>图 D21</b>　SpliceAI-lookup “Other scores”（T&gt;G）：REVEL 0.613（0 points），AlphaMissense 0.8497 —— 与 T&gt;A 相同（同一氨基酸改变）<br><span class="src">文件：screenshots/D21_SpliceAI_TG_REVEL_AlphaMissense.jpg　|　来源：https://spliceailookup.broadinstitute.org/#variant=chr2-166009728-T-G&amp;hg=38&amp;bc=basic&amp;distance=500&amp;mask=0&amp;ra=0　|　访问：2026-11-04 23:56 UTC</span></figcaption></figure>
+
+<h2>保守性：手动比对（表 A1）</h2>
+<p>方法：从 UniProt REST 取序列，以人 SCN1A 1311–1351 为查询序列，用 Smith–Waterman 局部比对（BLOSUM62，线性空位罚分 −4，我自己写的脚本）定位对应残基。<b>这是手动比对，不是数据库现成结果</b>；UCSC 比对/phyloP 页面查询时超时，未能截图（dbNSFP 给出的 phyloP100way = 0.615，对应摆动位的核苷酸保守性，意义有限）。黄色列 = 人 SCN1A 第 1331 位。</p>
+<table><tr><th>物种 / 基因</th><th>UniProt</th><th>比对窗口（人 1311–1351）</th><th>对应残基</th><th>位置</th></tr>
+<tr><td>Human SCN1A</td><td>P35498 (Swiss-Prot)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALLGAIPSIMNVL</td><td><b>E</b></td><td>1331</td></tr><tr><td>Mouse Scn1a</td><td>A2APX8 (Swiss-Prot)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALLGAIPSIMNVL</td><td><b>E</b></td><td>1331</td></tr><tr><td>Rat Scn1a</td><td>P04774 (Swiss-Prot)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALLGAIPSIMNVL</td><td><b>E</b></td><td>1331</td></tr><tr><td>Cow SCN1A</td><td>M0QW12 (TrEMBL)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALLGAIPSIMNVL</td><td><b>E</b></td><td>1331</td></tr><tr><td>Chicken SCN1A</td><td>A0A8V1A8W9 (TrEMBL)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALLGAIPSIMNVL</td><td><b>E</b></td><td>1338</td></tr><tr><td>Xenopus tropicalis scn1a</td><td>A0A8J1IT78 (TrEMBL)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALIGAIPSIMNVL</td><td><b>E</b></td><td>1329</td></tr><tr><td>Zebrafish scn1lab</td><td>F1QXF5 (TrEMBL)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALLGAIPSIMNVL</td><td><b>E</b></td><td>1312</td></tr><tr class="odd"><td>Zebrafish scn1laa</td><td>Q20JQ9 (TrEMBL)</td><td class='mono'>AIKSLRTLRAFRPLRALSRF<span class="hl">D</span>GMRVVVNALLGAIPSIMNVL</td><td><b>D</b></td><td>1280</td></tr><tr class="odd"><td>Drosophila para</td><td>P35500 (Swiss-Prot)</td><td class='mono'>AFKTMRTLRALRPLRAMSRM<span class="hl">Q</span>GMRVVVNALVQAIPSIFNVL</td><td><b>Q</b></td><td>1414</td></tr><tr><td>Human SCN2A</td><td>Q99250 (Swiss-Prot)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALLGAIPSIMNVL</td><td><b>E</b></td><td>1321</td></tr><tr><td>Human SCN3A</td><td>Q9NY46 (Swiss-Prot)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALVGAIPSIMNVL</td><td><b>E</b></td><td>1319</td></tr><tr><td>Human SCN8A</td><td>Q9UQD0 (Swiss-Prot)</td><td class='mono'>AIKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALVGAIPSIMNVL</td><td><b>E</b></td><td>1311</td></tr><tr><td>Human SCN4A</td><td>P35499 (Swiss-Prot)</td><td class='mono'>-IKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALLGAIPSIMNVL</td><td><b>E</b></td><td>1144</td></tr><tr><td>Human SCN5A</td><td>Q14524 (Swiss-Prot)</td><td class='mono'>-IKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALVGAIPSIMNVL</td><td><b>E</b></td><td>1318</td></tr><tr><td>Human SCN9A</td><td>Q15858 (Swiss-Prot)</td><td class='mono'>-IKSLRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVNALIGAIPSIMNVL</td><td><b>E</b></td><td>1305</td></tr><tr><td>Human SCN10A</td><td>Q9Y5Y9 (Swiss-Prot)</td><td class='mono'>-IKALRTLRALRPLRALSRF<span class="hl">E</span>GMRVVVDALVGAIPSIMNVL</td><td><b>E</b></td><td>1265</td></tr><tr><td>Human SCN11A</td><td>Q9UI33 (Swiss-Prot)</td><td class='mono'>-LKSFRTLRALRPLRALSQF<span class="hl">E</span>GMKVVVNALIGAIPAILNVL</td><td><b>E</b></td><td>1162</td></tr>
+</table>
+<p>解读：Glu 在全部 9 个人类电压门控钠通道 α 亚基、以及哺乳动物、鸡、爪蟾、斑马鱼 scn1lab 中保守，支持该位点功能重要；但斑马鱼 scn1laa 天然为 <b>Asp</b>，说明 E→D 这一保守替换至少在一个脊椎动物同源通道中可以耐受。这一点与 REVEL 处于不确定区间相符，<b>写进报告时用 suggests / is consistent with</b>。</p>
+
+<h2>F. ClinGen Epilepsy Sodium Channel VCEP《SCN1A 细则》v2.0（GN067）</h2>
+<p>附件 PM1 Table、Paralogous Gene Table、PVS1 exon numbering 为 xlsx，在页面 Files &amp; Images 点击下载按钮获得（保存在 ClinGen_VCEP附件/），D28、D29 是本地渲染后的截图，数值未改动。附件 “Combining Rules”（VCEP 的积分合并规则）和 “PS1_Variants impacting splicing” 是 PDF，<span class="need">按“PDF 只在你要求时下载”的规则没有下载</span>。</p>
+<figure id="D22"><img src="screenshots/D22_ClinGen_VCEP_SCN1A细则v2.0.jpg"><figcaption><b>图 D22</b>　ClinGen CSpec GN067：Epilepsy Sodium Channel VCEP《SCN1A 细则》Version 2.0，Released 1/7/2025，参考转录本 NM_001165963.3（与 .4 编码同一蛋白 NP_001159435.1）<br><span class="src">文件：screenshots/D22_ClinGen_VCEP_SCN1A细则v2.0.jpg　|　来源：https://cspec.genome.network/cspec/ui/svi/doc/GN067　|　访问：2026-11-04 23:53 UTC</span></figcaption></figure>
+<figure id="D23"><img src="screenshots/D23_VCEP_PM1_PM2.jpg"><figcaption><b>图 D23</b>　VCEP 细则：PM1 = Moderate（位于 Pathogenic Enriched Region，见附件 PM1 Table）；PM2 只能用 Supporting（≥10,000 个等位基因中 ≤1 个）<br><span class="src">文件：screenshots/D23_VCEP_PM1_PM2.jpg　|　来源：https://cspec.genome.network/cspec/ui/svi/doc/GN067　|　访问：2026-11-04 23:53 UTC</span></figcaption></figure>
+<figure id="D24"><img src="screenshots/D24_VCEP_PP2_PP3_PP4.jpg"><figcaption><b>图 D24</b>　VCEP 细则：PP2 不适用（良性错义常见）；PP3 用 REVEL 按 Pejaver 2022（PMID 36413997）判定，最高 Moderate，PP3+PM1 合计不超过 Strong；PP4 不适用（表型特异性已并入 PS2/PM6/PS4）<br><span class="src">文件：screenshots/D24_VCEP_PP2_PP3_PP4.jpg　|　来源：https://cspec.genome.network/cspec/ui/svi/doc/GN067　|　访问：2026-11-04 23:53 UTC</span></figcaption></figure>
+<figure id="D25"><img src="screenshots/D25_VCEP_PS2_Dravet标准与积分.jpg"><figcaption><b>图 D25</b>　VCEP 细则 PS2：Dravet 临床标准（Li 2021，PMID 34338318；含 Seizure onset ≤12m 等）；确认新发且表型为 Dravet 计 2 分 = PS2 Strong，GEFS+ 计 1 分<br><span class="src">文件：screenshots/D25_VCEP_PS2_Dravet标准与积分.jpg　|　来源：https://cspec.genome.network/cspec/ui/svi/doc/GN067　|　访问：2026-11-04 23:54 UTC</span></figcaption></figure>
+<figure id="D26"><img src="screenshots/D26_VCEP_PM6积分.jpg"><figcaption><b>图 D26</b>　VCEP 细则 PM6（假定新发、未确认亲缘）：Dravet 计 1 分，1 分 = Moderate<br><span class="src">文件：screenshots/D26_VCEP_PM6积分.jpg　|　来源：https://cspec.genome.network/cspec/ui/svi/doc/GN067　|　访问：2026-11-04 23:53 UTC</span></figcaption></figure>
+<figure id="D27"><img src="screenshots/D27_VCEP_PS3功能实验阈值.jpg"><figcaption><b>图 D27</b>　VCEP 细则 PS3（供 Q3 研究设计）：膜片钳峰电流 ≤72.7% 野生型等 = Strong；小鼠敲入模型自发惊厥 = Strong<br><span class="src">文件：screenshots/D27_VCEP_PS3功能实验阈值.jpg　|　来源：https://cspec.genome.network/cspec/ui/svi/doc/GN067　|　访问：2026-11-04 23:53 UTC</span></figcaption></figure>
+<figure id="D28"><img src="screenshots/D28_VCEP附件_PM1表_PER10.jpg"><figcaption><b>图 D28</b>　VCEP 附件 PM1 Table：SCN1A 1321–1364 属 PER #10；第 1331 行（SCN2A 1321 / SCN3A 1319 / SCN8A 1311）在表内 → PM1_Moderate 适用<br><span class="src">文件：screenshots/D28_VCEP附件_PM1表_PER10.jpg　|　来源：本地渲染：PM1_Table_v2.20241205.xlsx（在 GN067 页面 Files &amp; Images 点击下载按钮获得，未改动数值）　|　访问：2026-11-04 23:53 UTC</span></figcaption></figure>
+<figure id="D29"><img src="screenshots/D29_VCEP附件_旁系同源对照表.jpg"><figcaption><b>图 D29</b>　VCEP 附件 旁系同源氨基酸对照表：SCN1A 1331 = SCN2A 1321 = SCN3A 1319 = SCN8A 1311（用于 PS1/PM5 的旁系同源条款）<br><span class="src">文件：screenshots/D29_VCEP附件_旁系同源对照表.jpg　|　来源：本地渲染：Paralogous-Genes_AminoAcid-Mapping.xlsx（在 GN067 页面 Files &amp; Images 点击下载按钮获得，未改动数值）　|　访问：2026-11-04 23:53 UTC</span></figcaption></figure>
+
+<h2>附录：只用接口或脚本核对、没有截图的项目</h2>
+<ul>
+<li>NCBI E-utilities 下载 5 个 SCN1A RefSeq GenBank 记录并翻译（A5 补充说明）。</li>
+<li>VariantValidator REST：c.3993A&gt;C 同样给出 p.(Glu1331Asp)，GRCh38 g.166009728T&gt;G（网页版每个匿名用户提交次数有限，只截了 C&gt;T 和 A&gt;T）。</li>
+<li>gnomAD GraphQL API：区域内全部变异（含 AC0、AS_VQSR 等过滤变异）与逐位点覆盖度。</li>
+<li>ClinVar E-utilities：SCN1A 全部 5,556 条、SCN2A 3,203 条、SCN3A 2,272 条、SCN8A 2,664 条记录的标题筛选。</li>
+<li>PMC 开放获取全文接口：Pejaver 2022 表 2 的 REVEL 阈值。</li>
+</ul>
+<h2>待你在自己的 Chrome 补截的项目<span class="need">【需查】</span></h2>
+<ol>
+<li>NCBI RefSeq NM_001165963.4 页面（MANE Select 关键词、CDS 479..6508、ORIGIN 第 4441 行 “…ctcgatttga agggatgagg”）。</li>
+<li>Pejaver 2022 表 2（PMC9748256）REVEL 行。</li>
+<li>如果报告里要放 ClinVar 网页截图（而不是 E-utilities 输出），在 ClinVar 打开 VCV002036225（SCN2A E1321Q）。</li>
+<li>UCSC 保守性（可选；已有手动比对代替）。</li>
+</ol>
+</body></html>
